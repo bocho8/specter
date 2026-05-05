@@ -5,14 +5,6 @@ MODDIR=${0%/*}
 
 log "BOOT_HASH" "Start"
 
-_slot=$(getprop ro.boot.slot_suffix 2>/dev/null || echo "")
-
-if [ -n "$_slot" ]; then
-  _vbmeta="/dev/block/by-name/vbmeta$_slot"
-else
-  _vbmeta="/dev/block/by-name/vbmeta"
-fi
-
 _boot_hash=""
 
 if [ -f "/sdcard/Specter/boot_hash" ] 2>/dev/null; then
@@ -21,18 +13,21 @@ if [ -f "/sdcard/Specter/boot_hash" ] 2>/dev/null; then
 elif [ -f "$BOOT_HASH_FILE" ] 2>/dev/null; then
   _boot_hash=$(tr -cd '0-9a-fA-F' < "$BOOT_HASH_FILE" 2>/dev/null)
   log "BOOT_HASH" "Using existing hash file"
-elif [ -b "$_vbmeta" ] 2>/dev/null; then
-  _vbsize=$(blockdev --getsize64 "$_vbmeta" 2>/dev/null || echo "4096")
-  _vbhash=$(sha256sum "$_vbmeta" 2>/dev/null | awk '{print $1}')
-
-  resetprop -n ro.boot.vbmeta.size "$_vbsize" 2>/dev/null
-  resetprop -n ro.boot.vbmeta.hash_alg "sha256" 2>/dev/null
-  resetprop -n ro.boot.vbmeta.avb_version "2.0" 2>/dev/null
-
-  if [ -n "$_vbhash" ]; then
-    _boot_hash="$_vbhash"
-    log "BOOT_HASH" "Read from block device: $_vbhash"
+else
+  _vbmeta_out=$(read_vbmeta 2>/dev/null || echo "")
+  if [ -n "$_vbmeta_out" ]; then
+    _vbsize="${_vbmeta_out%% *}"
+    _vbhash="${_vbmeta_out#* }"
+    resetprop -n ro.boot.vbmeta.size "$_vbsize" 2>/dev/null
+    resetprop -n ro.boot.vbmeta.hash_alg "sha256" 2>/dev/null
+    resetprop -n ro.boot.vbmeta.avb_version "2.0" 2>/dev/null
+    if [ -n "$_vbhash" ]; then
+      _boot_hash="$_vbhash"
+      log "BOOT_HASH" "Read from block device: $_vbhash"
+    fi
+    unset _vbsize _vbhash
   fi
+  unset _vbmeta_out
 fi
 
 if [ -z "$_boot_hash" ] || [ "${#_boot_hash}" -ne 64 ]; then

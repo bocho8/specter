@@ -1,5 +1,6 @@
 import { CorePalette, Scheme } from '@material/material-color-utilities';
 import { cfgGet, cfgSet } from './cfg.js';
+import { exec } from './bridge.js';
 
 const PRESETS = {
   blue:   '#1157CE',
@@ -38,8 +39,6 @@ export async function initTheme(savedMode) {
 
 async function extractMonetColor() {
   try {
-    const { exec } = await import('./bridge.js');
-
     const commands = [
       `cmd overlay lookup com.android.systemui android:color/system_accent1_500 2>/dev/null`,
       `settings get secure monet_engine_seed 2>/dev/null`,
@@ -74,6 +73,12 @@ async function extractMonetColor() {
   return null;
 }
 
+function resolveMode(mode) {
+  return mode === 'auto'
+    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    : mode;
+}
+
 async function applyMonetPreset(mode) {
   let seed = await cfgGet('monet_seed', null);
   if (!seed) {
@@ -86,18 +91,16 @@ async function applyMonetPreset(mode) {
   }
   currentSeed = seed;
 
-  const resolved = mode === 'auto'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : mode;
+  const resolved = resolveMode(mode);
+  document.documentElement.setAttribute('data-theme', mode);
   document.documentElement.setAttribute('data-theme-preset', 'monet');
+  document.documentElement.setAttribute('data-theme-resolved', resolved);
   cfgSet('theme_preset', 'monet');
   generateScheme(seed, resolved === 'dark');
 }
 
 function applyMode(mode) {
-  const resolved = mode === 'auto'
-    ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
-    : mode;
+  const resolved = resolveMode(mode);
   document.documentElement.setAttribute('data-theme', mode);
   document.documentElement.setAttribute('data-theme-resolved', resolved);
   document.documentElement.style.colorScheme = resolved;
@@ -168,7 +171,7 @@ function wireThemeControls() {
   modeGroup?.addEventListener('segmented-button-set-selection', (e) => {
     const idx = e.detail.index;
     const btn = modeGroup.querySelectorAll('md-outlined-segmented-button')[idx];
-    if (btn) applyMode(btn.getAttribute('value'));
+    if (btn) applyMode(btn.getAttribute('value') || 'dark');
   });
 
   document.querySelectorAll('.preset-chip').forEach(chip => {

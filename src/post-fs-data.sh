@@ -1,3 +1,5 @@
+#!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/lib/common.sh"
 . "$MODDIR/lib/paths.sh"
@@ -60,27 +62,19 @@ fi
 # Read actual vbmeta partition to populate size, digest, and hash algorithm
 # ============================================================================
 
-_slot=$(getprop ro.boot.slot_suffix 2>/dev/null || echo "")
-_vbmeta_dev="/dev/block/by-name/vbmeta${_slot}"
-
-if [ -b "$_vbmeta_dev" ]; then
-  _vbmeta_size=$(blockdev --getsize64 "$_vbmeta_dev" 2>/dev/null)
+_vbmeta_out=$(read_vbmeta 2>/dev/null || echo "")
+if [ -n "$_vbmeta_out" ]; then
+  _vbmeta_size="${_vbmeta_out%% *}"
+  _vbmeta_digest="${_vbmeta_out#* }"
   [ -n "$_vbmeta_size" ] && resetprop -n ro.boot.vbmeta.size "$_vbmeta_size"
-
   resetprop -n ro.boot.vbmeta.hash_alg sha256
-
-  # Only compute digest if neither boot_hash file exists
-  if [ ! -f /sdcard/TSupportConfig/boot_hash ] && [ ! -f /data/adb/boot_hash ]; then
-    _vbmeta_digest=$(sha256sum "$_vbmeta_dev" 2>/dev/null | awk '{print $1}')
-    [ -n "$_vbmeta_digest" ] && resetprop -n ro.boot.vbmeta.digest "$_vbmeta_digest"
-    unset _vbmeta_digest
+  if [ ! -f /sdcard/TSupportConfig/boot_hash ] && [ ! -f /data/adb/boot_hash ] && [ -n "$_vbmeta_digest" ]; then
+    resetprop -n ro.boot.vbmeta.digest "$_vbmeta_digest"
   fi
-
-  unset _vbmeta_size
+  unset _vbmeta_size _vbmeta_digest
 else
-  log "POST-FS-DATA" "VBMeta block device not found at $_vbmeta_dev"
+  log "POST-FS-DATA" "VBMeta block device not found"
 fi
-
-unset _slot _vbmeta_dev
+unset _vbmeta_out
 
 log "POST-FS-DATA" "Done"

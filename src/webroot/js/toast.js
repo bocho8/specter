@@ -19,13 +19,15 @@ export function showToast(message, options = {}) {
   document.body.appendChild(toast);
   requestAnimationFrame(() => toast.classList.add('md-toast--open'));
 
-  toast.querySelector('.md-toast__close').onclick = () => close(toast);
+  const closeBtn = toast.querySelector('.md-toast__close');
+  if (closeBtn) closeBtn.addEventListener('click', () => close(toast));
 
   if (action && onActionClick) {
-    toast.querySelector('.md-toast__action').onclick = () => {
+    const actionBtn = toast.querySelector('.md-toast__action');
+    if (actionBtn) actionBtn.addEventListener('click', () => {
       close(toast);
       onActionClick();
-    };
+    });
   }
 
   if (autoCloseDelay > 0) {
@@ -78,7 +80,7 @@ function initSwipe(toast) {
     toast.style.transition = '';
     const isRtl = document.documentElement.dir === 'rtl';
     if ((isRtl && currentX < -80) || (!isRtl && currentX > 80)) {
-      dismiss(toast);
+      close(toast, { dismiss: true });
     } else {
       toast.style.transform = '';
       toast.classList.add('md-toast--open');
@@ -91,9 +93,9 @@ function initSwipe(toast) {
   toast.addEventListener('pointercancel', onEnd);
 }
 
-function dismiss(toast) {
+function close(toast, { dismiss = false } = {}) {
   toast.classList.remove('md-toast--open');
-  toast.classList.add('md-toast--dismiss');
+  if (dismiss) toast.classList.add('md-toast--dismiss');
   toast.addEventListener('transitionend', () => {
     if (toast.parentNode) toast.parentNode.removeChild(toast);
   }, { once: true });
@@ -104,14 +106,4 @@ function dismiss(toast) {
 
 export function closeToast(toast) {
   close(toast);
-}
-
-function close(toast) {
-  toast.classList.remove('md-toast--open');
-  toast.addEventListener('transitionend', () => {
-    if (toast.parentNode) toast.parentNode.removeChild(toast);
-  }, { once: true });
-  setTimeout(() => {
-    if (toast.parentNode) toast.parentNode.removeChild(toast);
-  }, 300);
 }

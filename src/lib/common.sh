@@ -10,7 +10,7 @@ download() {
     _dl_tmp="" _dl_code=1 _dl_try=0
 
     if [ -z "$_dl_output" ]; then
-        _dl_tmp=$(mktemp 2>/dev/null || echo "/data/local/tmp/.specter_dl_$$")
+        _dl_tmp=$(mktemp 2>/dev/null || echo "/data/local/tmp/.specter_dl_${$}_$(date +%s)")
         _dl_output="$_dl_tmp"
     fi
 
@@ -76,17 +76,7 @@ check_prop() {
     unset _cp_name _cp_expected _cp_value
 }
 
-contains_check_prop() {
-    _ccp_name=$1 _ccp_contains=$2 _ccp_newval=$3
-    case "$(resetprop "$_ccp_name")" in
-        *"$_ccp_contains"*) resetprop -n "$_ccp_name" "$_ccp_newval"; unset _ccp_name _ccp_contains _ccp_newval; return 0 ;;
-    esac
-    unset _ccp_name _ccp_contains _ccp_newval
-    return 1
-}
-
 detect_root_solution() {
-    _drs_magisk="" _drs_ksu="" _drs_apatch=""
 
     if [ -f "/data/adb/ksud" ]; then
         ROOT_SOL="kernelsu"
@@ -105,7 +95,6 @@ detect_root_solution() {
     fi
 
     log "ROOT" "Detected root solution: $ROOT_SOL"
-    unset _drs_magisk _drs_ksu _drs_apatch
 }
 
 resetprop_if_diff() {
@@ -141,19 +130,7 @@ resetprop_if_match() {
     return 1
 }
 
-delprop_if_exist() {
-    _dpe_name="$1"
-    _dpe_current=$(resetprop "$_dpe_name" 2>/dev/null || echo "")
-
-    if [ -n "$_dpe_current" ]; then
-        case "$ROOT_SOL" in
-            legacy) setprop "$_dpe_name" "" 2>/dev/null || true ;;
-            *) resetprop --delete "$_dpe_name" 2>/dev/null || true ;;
-        esac
-    fi
-
-    unset _dpe_name _dpe_current
-}
+PERSIST_RESTORE_FILE="/data/adb/Specter/persist_backup.txt"
 
 persistprop() {
     _pp_name="$1" _pp_value="$2"
@@ -165,9 +142,10 @@ persistprop() {
     esac
 
     _pp_restore=$(resetprop "$_pp_name" 2>/dev/null || echo "")
-    if [ -n "$_pp_restore" ] && [ -f "/data/adb/modules/Specter/uninstall.sh" ]; then
-        if ! grep -q "resetprop -n -p \"$_pp_name\"" /data/adb/modules/Specter/uninstall.sh 2>/dev/null; then
-            echo "resetprop -n -p \"$_pp_name\" \"$_pp_restore\"" >> /data/adb/modules/Specter/uninstall.sh 2>/dev/null || true
+    if [ -n "$_pp_restore" ]; then
+        ensure_dir "/data/adb/Specter"
+        if ! grep -q "^resetprop -n -p \"$_pp_name\"" "$PERSIST_RESTORE_FILE" 2>/dev/null; then
+            echo "resetprop -n -p \"$_pp_name\" \"$_pp_restore\"" >> "$PERSIST_RESTORE_FILE" 2>/dev/null || true
         fi
     fi
 
@@ -187,7 +165,8 @@ hide_recovery_folders() {
         if [ -f "$_hrf_path/.twrps" ]; then
             rm -f "$_hrf_path/.twrps" 2>/dev/null || {
                 _hrf_random=$(head /dev/urandom 2>/dev/null | tr -dc A-Za-z0-9 | head -c 12)
-                [ -n "$_hrf_random" ] && mv "$_hrf_path" "/sdcard/$_hrf_random" 2>/dev/null
+                [ -z "$_hrf_random" ] && _hrf_random="recovery_${$}"
+                mv "$_hrf_path" "/sdcard/$_hrf_random" 2>/dev/null
                 continue
             }
         fi
@@ -227,15 +206,19 @@ apply_prop_hardening() {
     resetprop_if_diff "ro.warranty_bit" "0"
     resetprop_if_diff "ro.is_ever_orange" "0"
 
-    for _aph_prop in $(resetprop 2>/dev/null | grep -oE 'ro.*\.build\.type' | grep -v 'ro.build.type'); do
+    while IFS= read -r _aph_prop; do
+        [ -z "$_aph_prop" ] && continue
         resetprop_if_diff "$_aph_prop" "user"
-    done
+    done <<PROPS
+$(resetprop 2>/dev/null | grep -oE 'ro.*\.build\.type' | grep -v 'ro.build.type')
+PROPS
 
-    for _aph_prop in $(resetprop 2>/dev/null | grep -oE 'ro.*\.build\.tags' | grep -v 'ro.build.tags'); do
+    while IFS= read -r _aph_prop; do
+        [ -z "$_aph_prop" ] && continue
         resetprop_if_diff "$_aph_prop" "release-keys"
-    done
-
-    unset _aph_prop
+    done <<PROPS
+$(resetprop 2>/dev/null | grep -oE 'ro.*\.build\.tags' | grep -v 'ro.build.tags')
+PROPS
 }
 
 apply_boot_hardening() {
@@ -264,8 +247,19 @@ version_ge() {
   }'
 }
 
+read_vbmeta() {
+  _rv_slot=$(getprop ro.boot.slot_suffix 2>/dev/null || echo "")
+  _rv_dev="/dev/block/by-name/vbmeta${_rv_slot}"
+  [ -b "$_rv_dev" ] || return 1
+  _rv_size=$(blockdev --getsize64 "$_rv_dev" 2>/dev/null) || return 1
+  _rv_digest=$(sha256sum "$_rv_dev" 2>/dev/null | awk '{print $1}') || return 1
+  echo "$_rv_size $_rv_digest"
+  unset _rv_slot _rv_dev _rv_size _rv_digest
+}
+
 run_device_info() {
   for _rdi_root in "$@"; do
+    [ -n "$_rdi_root" ] || continue
     [ -f "$_rdi_root/webroot/common/device-info.sh" ] && sh "$_rdi_root/webroot/common/device-info.sh" && return 0
   done
   for _rdi_p in \

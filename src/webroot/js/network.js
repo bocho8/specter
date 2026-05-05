@@ -28,25 +28,16 @@ async function updateNetworkStatus() {
   const onlineText  = getTranslation('home_status_online') || 'Online';
   const offlineText = getTranslation('home_status_offline') || 'Offline';
 
-  if (online) {
-    netChip?.classList.remove('offline');
-    if (netChip) {
-      const label = netChip.querySelector('#network-label');
-      if (label) label.textContent = onlineText;
-      const icon = netChip.querySelector('md-icon');
-      if (icon) icon.textContent = 'wifi';
-    }
-    if (netAnnounce) netAnnounce.textContent = onlineText;
-  } else {
-    netChip?.classList.add('offline');
-    if (netChip) {
-      const label = netChip.querySelector('#network-label');
-      if (label) label.textContent = offlineText;
-      const icon = netChip.querySelector('md-icon');
-      if (icon) icon.textContent = 'wifi_off';
-    }
+  if (netChip) {
+    const label = netChip.querySelector('#network-label');
+    const icon = netChip.querySelector('md-icon');
+    netChip.classList.toggle('offline', !online);
+    if (label) label.textContent = online ? onlineText : offlineText;
+    if (icon) icon.textContent = online ? 'wifi' : 'wifi_off';
+  }
+  if (netAnnounce) netAnnounce.textContent = online ? onlineText : offlineText;
 
-    if (netAnnounce) netAnnounce.textContent = offlineText;
+  if (!online && wasOnline === true) {
 
     if (wasOnline === true) {
       showToast(offlineText);

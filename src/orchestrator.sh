@@ -1,4 +1,5 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/lib/common.sh"
 
@@ -16,6 +17,7 @@ while IFS= read -r line; do
     optional=false
     [ "${feature%\?}" != "$feature" ] && optional=true && feature="${feature%\?}"
 
+    case "$feature" in *[!/a-zA-Z0-9_-]*) die "Invalid feature name: $feature" ;; esac
     FEATURE_PATH="$MODDIR/features/$feature"
     if [ "$optional" = "true" ] && [ ! -f "$FEATURE_PATH" ]; then
         log "ORCH" "Warning: Optional feature '$feature' not found -- skipping"

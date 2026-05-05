@@ -4,12 +4,13 @@
 
 _vol() {
   while true; do
-    local key=$(getevent -qlc 1 2>/dev/null)
-    case "$key" in
-      *KEY_VOLUMEUP*)   return 0 ;;
-      *KEY_VOLUMEDOWN*) return 1 ;;
-      *KEY_POWER*)      return 2 ;;
+    _vol_key=$(getevent -qlc 1 2>/dev/null)
+    case "$_vol_key" in
+      *KEY_VOLUMEUP*)   unset _vol_key; return 0 ;;
+      *KEY_VOLUMEDOWN*) unset _vol_key; return 1 ;;
+      *KEY_POWER*)      unset _vol_key; return 2 ;;
     esac
+    unset _vol_key
   done
 }
 
@@ -112,7 +113,7 @@ fi
 unset _ts_found
 
 mkdir -p "$MODPATH/webroot/json"
-RUNTIME_DIR=$(echo "$MODPATH" | sed 's|/modules_update/|/modules/|')
+RUNTIME_DIR=$(printf '%s' "$MODPATH" | sed 's|/modules_update/|/modules/|')
 cat > "$MODPATH/webroot/json/module_paths.json" <<JSON
 {"MODDIR": "$RUNTIME_DIR"}
 JSON

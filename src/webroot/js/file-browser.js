@@ -1,5 +1,6 @@
 import { shellEscape } from './utils.js';
 import { getTranslation } from './i18n.js';
+import { exec } from './bridge.js';
 
 export async function openFileBrowser(onSelect) {
   const t = (key, fallback) => getTranslation(key) || fallback;
@@ -95,7 +96,6 @@ export async function openFileBrowser(onSelect) {
       dialog.addEventListener('close', () => document.body.removeChild(dialog));
       dialog.show();
     }
-    const { exec } = await import('./bridge.js');
     try {
       const { stdout } = await exec(`ls -1p ${shellEscape(path)} 2>/dev/null | head -200`);
       entries = (stdout || '').split('\n').filter(Boolean).map(line => ({

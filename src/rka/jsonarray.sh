@@ -229,8 +229,21 @@ END {
 }
 '
 
-_ja_ensure() { [ ! -f "$1" ] && printf '[]' > "$1"; }
-_ja_uuid() { cat /proc/sys/kernel/random/uuid 2>/dev/null || printf '%s-%s' "$(date +%s)" "$$"; }
+_ja_ensure() {
+  [ ! -f "$1" ] && {
+    mkdir -p "$(dirname "$1")" 2>/dev/null
+    printf '[]' > "$1"
+  }
+}
+_ja_uuid() {
+  cat /proc/sys/kernel/random/uuid 2>/dev/null || \
+    printf '%04x%04x-%04x-%04x-%04x-%04x%04x%04x\n' \
+      $((RANDOM % 65536)) $((RANDOM % 65536)) \
+      $((RANDOM % 65536)) \
+      $((RANDOM % 65536)) \
+      $((RANDOM % 65536)) \
+      $((RANDOM % 65536)) $((RANDOM % 65536)) $((RANDOM % 65536))
+}
 
 ja_count() { _ja_ensure "$1"; awk -v OP=count "$_JA_AWK" "$1"; }
 ja_get()   { _ja_ensure "$1"; awk -v OP=get -v P1="$2" -v P2="$3" "$_JA_AWK" "$1"; }

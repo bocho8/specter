@@ -1,8 +1,10 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
 . "$MODDIR/../lib/paths.sh"
 . "$MODDIR/../lib/urls.sh"
+. "$MODDIR/../rka/jsonarray.sh"
 [ -z "$RKA_TOKEN" ] && { log "RKA" "Error: RKA_TOKEN is not set"; exit 1; }
 
 log "RKA" "Start"

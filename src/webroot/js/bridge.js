@@ -10,7 +10,7 @@ export async function initBridge() {
     if (MODULE?.MODDIR) {
       MODULE.MODDIR = MODULE.MODDIR.replace('/modules_update/', '/modules/');
     }
-    } catch { /* JSON/URL parse fallback */
+    } catch (e) { console.warn('Bridge init parse fallback:', e);
     const src = document.currentScript?.src || '';
     const m = src.match(/^(file:\/\/\/data\/adb\/modules\/[^/]+)/);
     MODULE = m ? { MODDIR: m[1] } : null;
@@ -89,7 +89,7 @@ function _runScriptRaw(command) {
           stdout: json.result || json.stdout || json.output || '',
           stderr: json.stderr || json.error || '',
         });
-      } catch { /* JSON.parse fallback */
+      } catch (e) { console.warn('Exec JSON parse fallback:', e);
         resolve({ stdout: code, stderr: '' });
       }
     };
@@ -157,7 +157,7 @@ function parseScriptOutput(raw) {
       output: json.result || json.stdout || json.output || '',
       rawOutput: raw,
     };
-  } catch { /* JSON.parse fallback */
+  } catch (e) { console.warn('Script output parse fallback:', e);
     const lower = raw.toLowerCase();
     const errorKeywords = ['not found', 'failed', 'error', 'permission denied', 'no such file'];
     const hasError = errorKeywords.some(kw => lower.includes(kw));

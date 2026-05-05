@@ -1,6 +1,4 @@
 export const EXEC_TIMEOUT_MS = 15000;
-export const PROVIDERS_CACHE_KEY = 'kb_providers_cache';
-export const PROVIDERS_CACHE_TTL = 3600000;
 export const ONLINE_ENDPOINTS = [
   'https://clients3.google.com/generate_204',
   'https://www.gstatic.com/generate_204',

@@ -1,3 +1,5 @@
+#!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 
 set +o standalone
@@ -7,7 +9,7 @@ unset ASH_STANDALONE
 
 log "ACTION" "Running full integrity pipeline"
 
-sh "$MODDIR/orchestrator.sh" full_integrity || return $?
+sh "$MODDIR/orchestrator.sh" full_integrity || exit $?
 
 run_device_info "$MODDIR"
 

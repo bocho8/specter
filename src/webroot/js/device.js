@@ -1,12 +1,11 @@
+import { shellEscape } from './utils.js';
+import { runScript, exec } from './bridge.js';
+import { appendToOutput } from './terminal.js';
+
 const INFO_URL = '/json/info.json';
 const KEYBOX_INFO_URL = '/json/keybox_info.json';
 
-let bridge = null;
 let infoCache = null;
-async function getBridge() {
-  if (!bridge) bridge = await import('./bridge.js');
-  return bridge;
-}
 
 export async function initDevice() {
   await loadDeviceInfo();
@@ -16,11 +15,9 @@ export async function initDevice() {
 }
 
 export async function refreshDevice() {
-  const { runScript } = await getBridge();
   try {
     const result = await runScript('device-info.sh', 'common');
     if (result.output) {
-      const { appendToOutput } = await import('./terminal.js');
       result.output.split('\n').filter(Boolean).forEach(l => appendToOutput(`[device-info] ${l}`));
     }
   } catch (e) {
@@ -30,11 +27,9 @@ export async function refreshDevice() {
 }
 
 export async function refreshKeyboxStatus() {
-  const { runScript } = await getBridge();
   try {
     const result = await runScript('keybox_info.sh', 'feature');
     if (result.output) {
-      const { appendToOutput } = await import('./terminal.js');
       result.output.split('\n').filter(Boolean).forEach(l => appendToOutput(`[keybox] ${l}`));
     }
   } catch (e) {
@@ -46,21 +41,26 @@ export async function refreshKeyboxStatus() {
 
 async function fetchDeviceInfo() {
   const res = await fetch(`${INFO_URL}?ts=${Date.now()}`);
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
   const data = await res.json();
-  if (data.android || data.kernel || data.root) {
+  if (data && (data.android || data.kernel || data.root)) {
     infoCache = data;
     return data;
   }
   throw new Error('empty');
 }
 
+function applyAllDeviceInfo(data) {
+  applyDeviceInfo(data);
+  if (data.flags) applyFlags(data.flags);
+  if (data.keybox_format) applyKeyboxFormat(data.keybox_format);
+  applyBootStages(data);
+}
+
 async function loadDeviceInfo() {
   try {
     const data = await fetchDeviceInfo();
-    applyDeviceInfo(data);
-    if (data.flags) applyFlags(data.flags);
-    if (data.keybox_format) applyKeyboxFormat(data.keybox_format);
-    applyBootStages(data);
+    applyAllDeviceInfo(data);
   } catch (e) {
     console.warn('Fetch device info failed:', e);
   }
@@ -71,10 +71,7 @@ async function waitForValidDeviceInfo(maxMs = 6000, intervalMs = 400) {
   while (Date.now() - start < maxMs) {
     try {
       const data = await fetchDeviceInfo();
-      applyDeviceInfo(data);
-      if (data.flags) applyFlags(data.flags);
-      if (data.keybox_format) applyKeyboxFormat(data.keybox_format);
-      applyBootStages(data);
+      applyAllDeviceInfo(data);
       return;
     } catch (e) {
       console.warn('Poll device info failed:', e);
@@ -119,7 +116,7 @@ function applyBootStages(data) {
   if (data.root_sol === "kernelsu" || data.root_sol === "apatch") {
     bar.style.display = 'flex';
     document.querySelectorAll('.boot-stage-dot').forEach(el => {
-      if (el.dataset.stage === 'boot-completed' && (data.root_sol === "kernelsu" || data.root_sol === "apatch")) {
+      if (el.dataset.stage === 'boot-completed') {
         el.style.color = 'var(--md-sys-color-tertiary)';
       } else if (el.dataset.stage === 'post-fs-data' || el.dataset.stage === 'service') {
         el.style.color = 'var(--md-sys-color-tertiary)';
@@ -227,27 +224,25 @@ function setText(id, value) {
 }
 
 export async function loadBlacklistContent() {
-  const { exec } = await getBridge();
   try {
     const { stdout } = await exec('cat /data/adb/Specter/blacklist.txt 2>/dev/null || echo ""');
     return stdout || '';
-  } catch { return ''; }
+  } catch (e) { console.warn('Failed to load blacklist:', e); return ''; }
 }
 
 export async function loadSmartmergeContent() {
-  const { exec } = await getBridge();
   try {
     const { stdout } = await exec('cat /sdcard/Specter/customize.txt 2>/dev/null || echo ""');
     return stdout || '';
-  } catch { return ''; }
+  } catch (e) { console.warn('Failed to load smartmerge:', e); return ''; }
 }
 
 export async function saveBlacklistContent(content) {
-  const { exec } = await getBridge();
-  await exec(`mkdir -p /data/adb/Specter && cat > /data/adb/Specter/blacklist.txt <<'EOF'\n${content}\nEOF`);
+  const { stdout: b64 } = await exec(`printf '%s' ${shellEscape(content)} | base64 -w0`);
+  await exec(`mkdir -p /data/adb/Specter && printf '%s' "${b64}" | base64 -d > /data/adb/Specter/blacklist.txt`);
 }
 
 export async function saveSmartmergeContent(content) {
-  const { exec } = await getBridge();
-  await exec(`mkdir -p /sdcard/Specter && cat > /sdcard/Specter/customize.txt <<'EOF'\n${content}\nEOF`);
+  const { stdout: b64 } = await exec(`printf '%s' ${shellEscape(content)} | base64 -w0`);
+  await exec(`mkdir -p /sdcard/Specter && printf '%s' "${b64}" | base64 -d > /sdcard/Specter/customize.txt`);
 }

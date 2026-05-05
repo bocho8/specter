@@ -1,4 +1,5 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
 . "$MODDIR/../lib/paths.sh"
@@ -81,7 +82,13 @@ for flag in "-3" "-s"; do
   }
   [ -z "$pkgs" ] && continue
   echo "$pkgs" | cut -d ":" -f 2 > "$TEMP_PKGS"
-  [ -f "/data/adb/Specter/blacklist_enabled" ] && [ -s "$BLACKLIST" ] && grep -Fvxf "$BLACKLIST" "$TEMP_PKGS" > "${TEMP_PKGS}.filtered" && mv "${TEMP_PKGS}.filtered" "$TEMP_PKGS"
+  if [ -f "/data/adb/Specter/blacklist_enabled" ] && [ -s "$BLACKLIST" ]; then
+    if grep -Fvxf "$BLACKLIST" "$TEMP_PKGS" > "${TEMP_PKGS}.filtered" 2>/dev/null; then
+      mv "${TEMP_PKGS}.filtered" "$TEMP_PKGS"
+    else
+      log "TARGET" "Warning: Blacklist filtering failed"
+    fi
+  fi
 
   while read -r pkg; do
     [ -z "$pkg" ] && continue
@@ -108,7 +115,7 @@ for flag in "-3" "-s"; do
     elif [ "$_customize_mode" = "condition_all" ]; then
       _suffix="?"
     fi
-    if [ -z "$_suffix" ] && ! $_custom_matched; then
+    if [ -z "$_suffix" ] && [ "$_custom_matched" != "true" ]; then
       [ "$teeBroken" = "true" ] && _suffix="?"
     fi
     echo "${pkg}${_suffix}" >> "$_TMP_TARGET"

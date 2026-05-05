@@ -6,7 +6,7 @@ import { getTranslation } from './i18n.js';
 function getHistory() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  } catch { return []; } /* JSON.parse fallback */
+  } catch (e) { console.warn('Failed to parse history:', e); return []; }
 }
 
 export function addEntry(scriptName, output) {
@@ -40,7 +40,7 @@ function formatTime(isoString) {
       return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) + ' at ' + timeStr;
     }
     return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-  } catch { /* Date parse fallback */
+  } catch (e) { console.warn('Failed to parse date:', e);
     return isoString;
   }
 }
@@ -119,7 +119,9 @@ export async function openRecentActivity(devMode = false) {
         navigator.clipboard.writeText(entry.output).then(() => {
           copyBtn.textContent = 'Copied!';
           setTimeout(() => { copyBtn.textContent = 'Copy'; }, 2000);
-        }).catch(() => {});
+        }).catch(() => {
+          copyBtn.textContent = 'Failed';
+        });
       });
     }
 
@@ -141,7 +143,7 @@ export async function openRecentActivity(devMode = false) {
   dialog.querySelector('.dialog-action-clear').addEventListener('click', async () => {
     clearHistory();
     dialog.close();
-    openRecentActivity();
+    setTimeout(() => openRecentActivity(), 100);
   });
   dialog.querySelector('.dialog-action-close').addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => document.body.removeChild(dialog));

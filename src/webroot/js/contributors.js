@@ -1,5 +1,6 @@
 import { escapeHtml } from './utils.js';
 import { getTranslation } from './i18n.js';
+import { openUrl } from './redirect.js';
 
 export async function loadContributors() {
   const grid = document.getElementById('contributors-grid');
@@ -16,12 +17,11 @@ export async function loadContributors() {
 
   grid.innerHTML = devs.map(dev => `
     <md-outlined-card class="contributor-card"
-               data-url="${encodeURI(dev.github || '')}">
+               data-url="${encodeURIComponent(dev.github || '')}">
       <img class="contributor-avatar"
            src="${escapeHtml(dev.avatar || '')}"
            alt="${escapeHtml(dev.name)}"
-           loading="lazy"
-           onerror="this.src='assets/icon.png'" />
+           loading="lazy" />
       <p class="md-typescale-label-large contributor-name">
         ${escapeHtml(dev.name)}
       </p>
@@ -31,9 +31,12 @@ export async function loadContributors() {
     </md-outlined-card>
   `).join('');
 
+  grid.querySelectorAll('.contributor-avatar').forEach(img => {
+    img.addEventListener('error', () => { img.src = 'assets/icon.png'; }, { once: true });
+  });
+
   grid.querySelectorAll('[data-url]').forEach(card => {
-    card.addEventListener('click', async () => {
-      const { openUrl } = await import('./redirect.js');
+    card.addEventListener('click', () => {
       openUrl(decodeURI(card.dataset.url));
     });
   });

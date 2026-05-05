@@ -1,7 +1,7 @@
 import './material.js';
-import { initBridge, spawnScript, getModuleDir as getBridgeModuleDir } from './bridge.js';
+import { initBridge, spawnScript, exec, getModuleDir as getBridgeModuleDir } from './bridge.js';
 import { setModuleDir, migrateLocalStorage, cfgGet, cfgSet } from './cfg.js';
-import { initDevice, refreshDevice, refreshKeyboxStatus } from './device.js';
+import { initDevice, refreshDevice, refreshKeyboxStatus, loadBlacklistContent, saveBlacklistContent, loadSmartmergeContent, saveSmartmergeContent } from './device.js';
 import { initClock } from './clock.js';
 import { initNetwork } from './network.js';
 import { initTheme } from './theme.js';
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   wireCustomKeybox();
   wireKeyboxInstallButton();
   await initI18n();
-  Promise.all([initClock(), initNetwork(), populateProviders(), loadContributors()]).catch(err => console.warn('Init error:', err));
+  await Promise.all([initClock(), initNetwork(), populateProviders(), loadContributors()]).catch(err => console.warn('Init error:', err));
   await initDevice();
   wireBlacklistToggle();
   wireSmartmergeEditor();
@@ -155,7 +155,7 @@ async function runDevAction(scriptName, item, spinner) {
   appendToOutput(`> ${scriptName}`);
   const dialog = document.createElement('md-dialog');
   dialog.innerHTML = `
-    <div slot="headline">${scriptName}</div>
+    <div slot="headline">${escapeHtml(scriptName)}</div>
     <div slot="content"><div class="terminal"><pre id="live-output"></pre></div></div>
     <div slot="actions">
       <md-text-button class="dialog-close">${getTranslation('dialog_close') || 'Close'}</md-text-button>
@@ -247,7 +247,8 @@ function wireRefreshButton() {
   if (!btn) return;
   btn.addEventListener('click', async () => {
     btn.disabled = true;
-    await Promise.all([refreshDevice(), refreshKeyboxStatus()]);
+    await refreshDevice();
+    await refreshKeyboxStatus();
     btn.disabled = false;
   });
 }
@@ -287,7 +288,8 @@ async function populateProviders() {
     const res = await fetch(API_URLS.KEY_CATALOG);
     if (res.ok) {
       const data = await res.json();
-      const sources = [...new Set((data.entries || []).map(e => e.source))].sort();
+      const entries = Array.isArray(data.entries) ? data.entries : [];
+      const sources = [...new Set(entries.map(e => e.source))].sort();
       const currentValue = select.value;
       renderProviderOptions(select, sources);
       select.value = currentValue;
@@ -410,8 +412,7 @@ async function openCustomKeyboxDialog() {
   });
 
   applyBtn.addEventListener('click', async () => {
-    const { exec, getModuleDir } = await import('./bridge.js');
-    const moddir = getModuleDir();
+    const moddir = getBridgeModuleDir();
     const text = urlInput.value.trim();
 
     if (!text) {
@@ -561,10 +562,8 @@ function wireBlacklistToggle() {
   if (!sw) return;
 
   sw.addEventListener('change', async () => {
-    const { exec } = await import('./bridge.js');
     if (sw.selected) {
       await exec('mkdir -p /data/adb/Specter && touch /data/adb/Specter/blacklist_enabled');
-      const { loadBlacklistContent } = await import('./device.js');
       if (input) input.value = await loadBlacklistContent();
       if (editor) editor.style.display = 'block';
     } else {
@@ -579,7 +578,6 @@ function wireBlacklistToggle() {
 
   if (saveBtn && input) {
     saveBtn.addEventListener('click', async () => {
-      const { saveBlacklistContent } = await import('./device.js');
       await saveBlacklistContent(input.value);
       showToast('Blacklist saved', { icon: 'check_circle', type: 'success', autoCloseDelay: 2000 });
     });
@@ -598,7 +596,6 @@ function wireBlacklistToggle() {
         'com.smlj.rootcheck', 'com.devadvance.rootcloak', 'com.devadvance.rootcloakplus', 'mmrl'
       ].join('\n');
       if (input) input.value = defaults;
-      const { saveBlacklistContent } = await import('./device.js');
       await saveBlacklistContent(defaults);
       showToast('Blacklist reset to defaults', { icon: 'check_circle', type: 'success', autoCloseDelay: 2000 });
     });
@@ -615,7 +612,6 @@ function wireSmartmergeEditor() {
   row.addEventListener('click', async () => {
     const isVisible = editor.style.display !== 'none';
     if (!isVisible) {
-      const { loadSmartmergeContent } = await import('./device.js');
       if (input) input.value = await loadSmartmergeContent();
       editor.style.display = 'block';
     } else {
@@ -625,7 +621,6 @@ function wireSmartmergeEditor() {
 
   if (saveBtn && input) {
     saveBtn.addEventListener('click', async () => {
-      const { saveSmartmergeContent } = await import('./device.js');
       await saveSmartmergeContent(input.value);
       showToast('SmartMerge saved', { icon: 'check_circle', type: 'success', autoCloseDelay: 2000 });
       editor.style.display = 'none';
@@ -637,7 +632,6 @@ function wireToggles() {
   const recoverySw = document.getElementById('recovery-switch');
   if (recoverySw) {
     recoverySw.addEventListener('change', async () => {
-      const { exec } = await import('./bridge.js');
       if (recoverySw.selected) {
         await exec('mkdir -p /data/adb/Specter && touch /data/adb/Specter/twrp');
       } else {

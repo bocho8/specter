@@ -14,4 +14,6 @@ Module/webroot/lang/source/string.json
 string.yml
 yurikey-main
 module/
+Module/
+src/webroot/dist/
 checklist.md

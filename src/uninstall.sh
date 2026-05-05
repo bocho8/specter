@@ -1,3 +1,5 @@
+#!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/lib/common.sh"
 . "$MODDIR/lib/paths.sh"
@@ -34,10 +36,22 @@ if [ -f "$IDFILE" ]; then
 fi
 
 # Clean up RKA config in PassIt app data
-RKA_CFG="/data/user/$(id -u)/io.github.mhmrdd.libxposed.ps.passit/files/rka_configs.json"
-if [ -f "$RKA_CFG" ]; then
-    rm -f "$RKA_CFG" 2>/dev/null
-    log "UNINSTALL" "Removed RKA config"
+_uid=$(id -u 2>/dev/null || echo "")
+if [ -n "$_uid" ]; then
+  RKA_CFG="/data/user/$_uid/io.github.mhmrdd.libxposed.ps.passit/files/rka_configs.json"
+  if [ -f "$RKA_CFG" ]; then
+      rm -f "$RKA_CFG" 2>/dev/null
+      log "UNINSTALL" "Removed RKA config"
+  fi
+  unset RKA_CFG
+fi
+unset _uid
+
+# Restore persisted props
+if [ -f "/data/adb/Specter/persist_backup.txt" ]; then
+  sh "/data/adb/Specter/persist_backup.txt" 2>/dev/null || true
+  rm -f "/data/adb/Specter/persist_backup.txt" 2>/dev/null
+  log "UNINSTALL" "Restored persistent props"
 fi
 
 return 0

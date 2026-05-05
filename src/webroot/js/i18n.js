@@ -7,7 +7,7 @@ export async function initI18n() {
   try {
     const res = await fetch(`lang/source/string.json?ts=${Date.now()}`);
     fallbackStrings = await res.json();
-  } catch { fallbackStrings = {}; }
+  } catch (e) { console.warn('Failed to load fallback strings:', e); fallbackStrings = {}; }
 
   const saved = await cfgGet('lang', 'auto') || 'auto';
   let langCode;
@@ -30,7 +30,7 @@ export async function applyLanguage(langCode) {
   try {
     const res = await fetch(url);
     currentStrings = await res.json();
-  } catch { /* fetch/parse fallback */
+  } catch (e) { console.warn('Failed to load language:', e);
     currentStrings = {};
   }
 

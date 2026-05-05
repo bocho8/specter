@@ -16,7 +16,7 @@ export function openUrl(rawUrl) {
   let url;
   try {
     url = new URL(rawUrl);
-  } catch { /* URL parse fallback */
+  } catch (e) { console.warn('Invalid URL:', e);
     return;
   }
 
@@ -24,11 +24,12 @@ export function openUrl(rawUrl) {
   if (!ALLOWED_HOSTS.some(h => url.hostname === h || url.hostname.endsWith('.' + h))) return;
 
   if (window.ksu?.exec) {
-    window.__redirect_cb = window.__redirect_cb || function() {};
+    const cbName = `rd_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    window[cbName] = function() { delete window[cbName]; };
     window.ksu.exec(
       `am start -a android.intent.action.VIEW -d ${shellEscape(url.href)}`,
       '{}',
-      '__redirect_cb'
+      cbName
     );
   } else {
     window.open(url.href, '_blank');

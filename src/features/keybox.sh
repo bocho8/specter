@@ -1,4 +1,5 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
 . "$MODDIR/../lib/paths.sh"
@@ -15,8 +16,9 @@ if [ -f "$TARGET_FILE" ] && [ ! -f "$BACKUP_FILE" ]; then
   log "KEYBOX" "Created backup of existing keybox"
 fi
 
-DECODE_FILE="$TRICKY_DIR/keybox_decode"
-TEMP_FILE="$TRICKY_DIR/keybox.tmp"
+DECODE_FILE="/data/local/tmp/keybox_decode.$$"
+TEMP_FILE="/data/local/tmp/keybox.tmp.$$"
+trap 'rm -f "$DECODE_FILE" "$TEMP_FILE" 2>/dev/null' EXIT
 _FALLBACK_BASE="${KEYBOX_URL}/fallback"
 
 _custom_type=$(cat "$CONFIG_DIR/kb_custom_type.val" 2>/dev/null || echo "")
@@ -33,6 +35,8 @@ if [ -n "$_custom_type" ] && [ -n "$_custom_value" ]; then
         exit 0
       fi
       log "KEYBOX" "Error: Custom keybox file not found: $_custom_value"
+      rm -f "$TEMP_FILE"
+      exit 1
       ;;
     url)
       log "KEYBOX" "Downloading custom keybox from URL..."

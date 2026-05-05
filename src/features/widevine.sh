@@ -1,25 +1,26 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
 . "$MODDIR/../lib/paths.sh"
 . "$MODDIR/../lib/urls.sh"
-trap 'rm -f /data/local/tmp/attestation 2>/dev/null' EXIT
+WDIR="/data/local/tmp"
+_attestation_file="$WDIR/attestation.$$"
+trap 'rm -f "$_attestation_file" 2>/dev/null' EXIT
 
 log "WIDEVINE" "Start"
 
 check_network || { log "WIDEVINE" "Error: No internet connection"; exit 1; }
 
-WDIR="/data/local/tmp"
-
 log "WIDEVINE" "Downloading attestation key..."
-download "$ATTESTATION_URL" > "$WDIR/attestation" 2>/dev/null || {
+download "$ATTESTATION_URL" > "$_attestation_file" 2>/dev/null || {
   log "WIDEVINE" "Error: Failed to download attestation key"
   exit 1
 }
 log "WIDEVINE" "Attestation key downloaded successfully"
 
-chmod 755 "$WDIR/attestation" 2>/dev/null || log "WIDEVINE" "Warning: Failed to set permissions on attestation"
-chown root:root "$WDIR/attestation" 2>/dev/null || log "WIDEVINE" "Warning: Failed to set owner on attestation"
+chmod 755 "$_attestation_file" 2>/dev/null || log "WIDEVINE" "Warning: Failed to set permissions on attestation"
+chown root:root "$_attestation_file" 2>/dev/null || log "WIDEVINE" "Warning: Failed to set owner on attestation"
 
 _abi=$(getprop ro.product.cpu.abi 2>/dev/null)
 case "$_abi" in
@@ -33,21 +34,17 @@ KM_BIN=$(find_kmInstallKeybox)
 if [ -n "$KM_BIN" ]; then
   log "WIDEVINE" "Found KmInstallKeybox at $KM_BIN"
   log "WIDEVINE" "Running KmInstallKeybox with attestation key..."
-  LD_LIBRARY_PATH="$_lib" "$KM_BIN" "$WDIR/attestation" attestation true 2>/dev/null || {
+  LD_LIBRARY_PATH="$_lib" "$KM_BIN" "$_attestation_file" attestation true 2>/dev/null || {
     log "WIDEVINE" "Error: KmInstallKeybox exited with non-zero status"
-    rm -f "$WDIR/attestation"
     exit 1
   }
   log "WIDEVINE" "KmInstallKeybox completed successfully"
 else
   log "WIDEVINE" "Error: KmInstallKeybox not found (non-Qualcomm device?)"
-  rm -f "$WDIR/attestation"
   exit 1
 fi
 unset KM_BIN
 unset _abi _lib
-
-rm -f "$WDIR/attestation" 2>/dev/null
 
 log "WIDEVINE" "Finish"
 exit 0

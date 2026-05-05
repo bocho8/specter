@@ -1,5 +1,8 @@
+#!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/lib/common.sh"
+. "$MODDIR/lib/package_list.sh"
 
 log "SERVICE" "Setting boot properties"
 
@@ -34,12 +37,15 @@ resetprop_if_diff ro.adb.secure 1
 resetprop_if_diff ro.build.type user
 resetprop_if_diff ro.build.tags release-keys
 # Loop over all ro.*.build.type and ro.*.build.tags variants
-for _prop in $(resetprop 2>/dev/null | grep -oE 'ro\.[^.]+\.build\.(type|tags)'); do
+while IFS= read -r _prop; do
+  [ -z "$_prop" ] && continue
   case "$_prop" in
     *.build.type) resetprop_if_diff "$_prop" user ;;
     *.build.tags) resetprop_if_diff "$_prop" release-keys ;;
   esac
-done
+done <<PROPS
+$(resetprop 2>/dev/null | grep -oE 'ro\.[^.]+\.build\.(type|tags)')
+PROPS
 unset _prop
 
 # --- Static vbmeta metadata ---
@@ -108,21 +114,7 @@ log "SERVICE" "Boot completed — applying hardening"
 apply_boot_hardening
 
 # DroidGuard killer — force-stop GMS and related services to break attestation
-for _pkg in \
-  com.android.vending \
-  com.android.chrome \
-  com.google.android.googlequicksearchbox \
-  com.google.android.ims \
-  com.google.android.gms \
-  com.google.android.gms.persistent \
-  com.google.android.gms.unstable \
-  com.google.android.gsf \
-  com.google.android.contactkeys \
-  com.google.android.rkpdapp \
-  com.google.android.widevine \
-  com.google.android.apps.bard \
-  com.google.android.apps.walletnfcrel \
-  com.google.android.apps.messaging; do
+for _pkg in $GMS_KILL_LIST; do
   am force-stop "$_pkg" 2>/dev/null || true
 done
 unset _pkg

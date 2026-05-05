@@ -1,13 +1,15 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
+. "$MODDIR/../lib/package_list.sh"
 
 log "GMS" "Start"
 
 _installed_pkgs=$(pm list packages 2>/dev/null)
 _count=0
 
-for _pkg in com.android.vending com.android.chrome com.google.android.googlequicksearchbox com.google.android.ims com.google.android.gms com.google.android.gms.persistent com.google.android.gms.unstable com.google.android.gsf com.google.android.contactkeys com.google.android.rkpdapp com.google.android.widevine com.google.android.apps.bard com.google.android.apps.walletnfcrel com.google.android.apps.messaging; do
+for _pkg in $GMS_KILL_LIST; do
   echo "$_installed_pkgs" | grep -Fq "package:$_pkg" || continue
   log "GMS" "Force-stopping $_pkg"
   am force-stop "$_pkg" >/dev/null 2>&1 || log "GMS" "Warning: Failed to force-stop $_pkg"
