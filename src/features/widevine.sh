@@ -2,6 +2,8 @@
 set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
+. "$MODDIR/../lib/config_env.sh"
+[ "$(cfg_get toggle_widevine 1)" = "0" ] && exit 0
 . "$MODDIR/../lib/paths.sh"
 . "$MODDIR/../lib/urls.sh"
 WDIR="/data/local/tmp"

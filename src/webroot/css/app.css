@@ -772,7 +772,6 @@ md-divider.settings-divider {
   left: 50%;
   transform: translateX(-50%);
   width: fit-content;
-  max-width: calc(100vw - 24px);
   display: flex;
   justify-content: center;
   align-items: center;

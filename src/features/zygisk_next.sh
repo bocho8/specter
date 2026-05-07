@@ -2,6 +2,8 @@
 set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
+. "$MODDIR/../lib/config_env.sh"
+[ "$(cfg_get toggle_zygisk_next 1)" = "0" ] && exit 0
 . "$MODDIR/../lib/paths.sh"
 
 REQUIRED="1.3.0"

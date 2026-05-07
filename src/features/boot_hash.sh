@@ -3,6 +3,8 @@ set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
 . "$MODDIR/../lib/paths.sh"
+. "$MODDIR/../lib/config_env.sh"
+[ "$(cfg_get toggle_boot_hash 1)" = "0" ] && exit 0
 
 log "BOOT_HASH" "Start"
 

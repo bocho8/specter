@@ -132,11 +132,6 @@ if [ "$_ts_found" = true ]; then
 
   esac
   unset _choice
-
-  ui_print ""
-  ui_print " Updating target file..."
-  sh "$MODPATH/features/target.sh"
-  ui_print "- Target file updated"
 fi
 unset _ts_found
 

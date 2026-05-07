@@ -1,8 +1,8 @@
 {
   "app_title": "Specter",
   "nav_home": "主页",
-  "nav_setup": "Setup",
-  "nav_maintain": "Maintain",
+  "nav_tools": "Tools",
+  "nav_control": "Control",
   "nav_settings": "设置",
   "home_version": "模块版本",
   "home_android": "Android",

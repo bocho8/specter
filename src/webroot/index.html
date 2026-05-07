@@ -107,7 +107,7 @@
 
         </section>
 
-        <section id="setup-page" hidden>
+        <section id="tools-page" hidden>
 
           <h2 class="list-title" data-i18n="menu_keybox">Keybox</h2>
           <md-filled-card class="keybox-install-card">
@@ -179,68 +179,6 @@
               <md-ripple></md-ripple>
             </div>
           </div>
-
-          <h2 class="list-title" data-i18n="menu_blacklist">Blacklist</h2>
-          <div class="list-container">
-            <div class="list-item list-item--toggle" id="blacklist-toggle-row">
-              <div class="li-icon"><md-icon aria-hidden="true">block</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="menu_blacklist_toggle">Filter Blacklisted Apps</div>
-                <span class="supporting-text" data-i18n="menu_blacklist_toggle_desc">Exclude detector apps from target.txt generation</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="blacklist-switch"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-          </div>
-          <div id="blacklist-editor" class="blacklist-editor" style="display:none">
-            <md-outlined-text-field id="blacklist-input" type="textarea" rows="6" style="width:100%;--md-outlined-text-field-container-shape:14px">
-              <div slot="headline" data-i18n="menu_blacklist_edit">Edit blacklist (one package per line)</div>
-            </md-outlined-text-field>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <md-filled-tonal-button id="blacklist-save-btn" style="flex:1"><span data-i18n="dialog_save">Save</span></md-filled-tonal-button>
-              <md-outlined-button id="blacklist-reset-btn" style="flex:1"><span data-i18n="dialog_reset_defaults">Reset Defaults</span></md-outlined-button>
-            </div>
-          </div>
-
-          <h2 class="list-title" data-i18n="menu_smartmerge">SmartMerge</h2>
-          <div class="list-container">
-            <div class="list-item" id="smartmerge-row">
-              <div class="li-icon"><md-icon aria-hidden="true">merge_type</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="menu_smartmerge_desc">Customize Per-App Targeting</div>
-                <span class="supporting-text" data-i18n="menu_smartmerge_desc_sub">Edit /sdcard/Specter/customize.txt for per-app suffix control (!, ?, or bare)</span>
-              </div>
-              <div class="spacer"></div>
-              <md-ripple></md-ripple>
-            </div>
-          </div>
-          <div id="smartmerge-editor" class="smartmerge-editor" style="display:none">
-            <md-outlined-text-field id="smartmerge-input" type="textarea" rows="4" style="width:100%;--md-outlined-text-field-container-shape:14px">
-              <div slot="headline" data-i18n="menu_smartmerge_hint">One package per line. Suffix with ! (force) or ? (conditional). First line can be !, ?, or #disable</div>
-            </md-outlined-text-field>
-            <div style="display:flex;gap:8px;margin-top:8px">
-              <md-filled-tonal-button id="smartmerge-save-btn" style="flex:1"><span data-i18n="dialog_save">Save</span></md-filled-tonal-button>
-            </div>
-          </div>
-
-          <h2 class="list-title" data-i18n="advance_toggles_title">Boot Behavior</h2>
-          <div class="list-container">
-            <div class="list-item list-item--toggle" id="recovery-toggle-row">
-              <div class="li-icon"><md-icon aria-hidden="true">folder_off</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="advance_toggle_recovery">Auto-Hide Recovery Folders</div>
-                <span class="supporting-text" data-i18n="advance_toggle_recovery_desc">Hides TWRP, OrangeFox, FOX, PBRP, PitchBlack, Recovery at boot</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="recovery-switch"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-          </div>
-
-        </section>
-
-        <section id="maintain-page" hidden>
 
           <h2 class="list-title" data-i18n="menu_google_services">Google Services</h2>
           <div class="list-container">
@@ -317,6 +255,50 @@
             </div>
           </div>
 
+          <h2 class="list-title" data-i18n="menu_blacklist">Blacklist</h2>
+          <div class="list-container">
+            <div class="list-item list-item--toggle" id="blacklist-toggle-row">
+              <div class="li-icon"><md-icon aria-hidden="true">block</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="menu_blacklist_toggle">Filter Blacklisted Apps</div>
+                <span class="supporting-text" data-i18n="menu_blacklist_toggle_desc">Exclude detector apps from target.txt generation</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="blacklist-switch"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+          </div>
+          <div id="blacklist-editor" class="blacklist-editor" style="display:none">
+            <md-outlined-text-field id="blacklist-input" type="textarea" rows="6" style="width:100%;--md-outlined-text-field-container-shape:14px">
+              <div slot="headline" data-i18n="menu_blacklist_edit">Edit blacklist (one package per line)</div>
+            </md-outlined-text-field>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <md-filled-tonal-button id="blacklist-save-btn" style="flex:1"><span data-i18n="dialog_save">Save</span></md-filled-tonal-button>
+              <md-outlined-button id="blacklist-reset-btn" style="flex:1"><span data-i18n="dialog_reset_defaults">Reset Defaults</span></md-outlined-button>
+            </div>
+          </div>
+
+          <h2 class="list-title" data-i18n="menu_smartmerge">SmartMerge</h2>
+          <div class="list-container">
+            <div class="list-item" id="smartmerge-row">
+              <div class="li-icon"><md-icon aria-hidden="true">merge_type</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="menu_smartmerge_desc">Customize Per-App Targeting</div>
+                <span class="supporting-text" data-i18n="menu_smartmerge_desc_sub">Edit /sdcard/Specter/customize.txt for per-app suffix control (!, ?, or bare)</span>
+              </div>
+              <div class="spacer"></div>
+              <md-ripple></md-ripple>
+            </div>
+          </div>
+          <div id="smartmerge-editor" class="smartmerge-editor" style="display:none">
+            <md-outlined-text-field id="smartmerge-input" type="textarea" rows="4" style="width:100%;--md-outlined-text-field-container-shape:14px">
+              <div slot="headline" data-i18n="menu_smartmerge_hint">One package per line. Suffix with ! (force) or ? (conditional). First line can be !, ?, or #disable</div>
+            </md-outlined-text-field>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <md-filled-tonal-button id="smartmerge-save-btn" style="flex:1"><span data-i18n="dialog_save">Save</span></md-filled-tonal-button>
+            </div>
+          </div>
+
           <h2 class="list-title danger-zone-title" data-i18n="tools_danger_zone">Danger Zone</h2>
           <p class="danger-zone-desc" data-i18n="tools_danger_zone_desc">Destructive operations that may affect your device</p>
           <div class="list-container">
@@ -361,6 +343,127 @@
               </div>
               <div class="spacer"></div>
               <md-circular-progress indeterminate class="action-spinner hidden"></md-circular-progress>
+              <md-ripple></md-ripple>
+            </div>
+          </div>
+
+        </section>
+
+        <section id="control-page" hidden>
+
+          <h2 class="list-title" data-i18n="control_boot_title">Boot Behavior</h2>
+          <div class="list-container">
+
+            <div class="list-item list-item--toggle" id="toggle-recovery-row">
+              <div class="li-icon"><md-icon aria-hidden="true">folder_off</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_recovery">Auto-Hide Recovery Folders</div>
+                <span class="supporting-text" data-i18n="control_toggle_recovery_desc">Hide TWRP, OrangeFox, FOX recovery folders from /sdcard at boot</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-recovery"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-boot_hardening-row">
+              <div class="li-icon"><md-icon aria-hidden="true">security</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_boot_hardening">Boot Hardening</div>
+                <span class="supporting-text" data-i18n="control_toggle_boot_hardening_desc">Apply security prop hardening (ro.secure, ro.debuggable, etc.) at boot</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-boot_hardening"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-bootloader_spoofer-row">
+              <div class="li-icon"><md-icon aria-hidden="true">lock</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_bootloader_spoofer">Bootloader Spoofer Block</div>
+                <span class="supporting-text" data-i18n="control_toggle_bootloader_spoofer_desc">Remove conflicting bootloader spoofer packages at boot</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-bootloader_spoofer"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-rom_spoof-row">
+              <div class="li-icon"><md-icon aria-hidden="true">smartphone</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_rom_spoof">Block ROM Spoof Engines</div>
+                <span class="supporting-text" data-i18n="control_toggle_rom_spoof_desc">Disable ROM-level spoof engines (PixelProps, PIHooks, etc.)</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-rom_spoof"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-lsposed-row">
+              <div class="li-icon"><md-icon aria-hidden="true">code</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_lsposed">LSPosed ODEX Clean</div>
+                <span class="supporting-text" data-i18n="control_toggle_lsposed_desc">Delete base.odex files from /data/app at boot (LSPosed trace clean)</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-lsposed"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+          </div>
+
+          <h2 class="list-title" data-i18n="control_action_title">Action Pipeline</h2>
+          <div class="list-container">
+            <div class="list-item list-item--toggle" id="toggle-action_gms-row">
+              <div class="li-icon"><md-icon aria-hidden="true">block</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_action_gms">Kill Play Store</div>
+                <span class="supporting-text" data-i18n="control_toggle_action_gms_desc">Force-stop and clear Play Store, GMS, and DroidGuard processes</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-action_gms"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-action_target-row">
+              <div class="li-icon"><md-icon aria-hidden="true">list_alt</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_action_target">Regenerate Target</div>
+                <span class="supporting-text" data-i18n="control_toggle_action_target_desc">Regenerate Tricky Store target.txt with all installed apps</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-action_target"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-action_security_patch-row">
+              <div class="li-icon"><md-icon aria-hidden="true">security_update_good</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_action_security_patch">Set Security Patch</div>
+                <span class="supporting-text" data-i18n="control_toggle_action_security_patch_desc">Write spoofed security patch date to Tricky Store</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-action_security_patch"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-action_boot_hash-row">
+              <div class="li-icon"><md-icon aria-hidden="true">verified</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_action_boot_hash">Set Verified Boot Hash</div>
+                <span class="supporting-text" data-i18n="control_toggle_action_boot_hash_desc">Read and write verified boot hash for attestation</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-action_boot_hash"></md-switch>
+              <md-ripple></md-ripple>
+            </div>
+
+            <div class="list-item list-item--toggle" id="toggle-action_pif-row">
+              <div class="li-icon"><md-icon aria-hidden="true">fingerprint</md-icon></div>
+              <div class="list-item-content">
+                <div class="toggle-text" data-i18n="control_toggle_action_pif">Set Fingerprint (PIF)</div>
+                <span class="supporting-text" data-i18n="control_toggle_action_pif_desc">Run Play Integrity Fix auto-update scripts</span>
+              </div>
+              <div class="spacer"></div>
+              <md-switch icons id="toggle-action_pif"></md-switch>
               <md-ripple></md-ripple>
             </div>
           </div>
@@ -495,14 +598,14 @@
         <span class="nav-label" data-i18n="nav_home">Home</span>
       </button>
 
-      <button class="nav-tab" data-page="setup-page" >
-        <md-icon class="nav-icon" aria-hidden="true">tune</md-icon>
-        <span class="nav-label" data-i18n="nav_setup">Setup</span>
+      <button class="nav-tab" data-page="tools-page" >
+        <md-icon class="nav-icon" aria-hidden="true">build</md-icon>
+        <span class="nav-label" data-i18n="nav_tools">Tools</span>
       </button>
 
-      <button class="nav-tab" data-page="maintain-page" >
-        <md-icon class="nav-icon" aria-hidden="true">build</md-icon>
-        <span class="nav-label" data-i18n="nav_maintain">Maintain</span>
+      <button class="nav-tab" data-page="control-page" >
+        <md-icon class="nav-icon" aria-hidden="true">tune</md-icon>
+        <span class="nav-label" data-i18n="nav_control">Control</span>
       </button>
 
       <button class="nav-tab" data-page="settings-page" >

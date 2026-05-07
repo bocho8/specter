@@ -1,8 +1,8 @@
 {
   "app_title": "Specter",
   "nav_home": "Главная",
-  "nav_setup": "Setup",
-  "nav_maintain": "Maintain",
+  "nav_tools": "Tools",
+  "nav_control": "Control",
   "nav_settings": "Настройки",
   "home_version": "Версия модуля",
   "home_android": "Android",

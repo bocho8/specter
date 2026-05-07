@@ -17,8 +17,14 @@ Keybox management, security spoofing, and detection avoidance — all in one mod
 
 Specter is a fork of Yurikey, rewritten for clean architecture, proper error handling, and multi-source keybox support. 100% free, no paywalls, no business agenda — just a module that works.
 
-If Specter helps you out, consider buying me a coffee:
-[ko-fi.com/dpejoh](https://ko-fi.com/dpejoh)
+## Support
+
+If Specter helps you out, consider supporting the project:
+
+- Ko-fi: [ko-fi.com/dpejoh](https://ko-fi.com/dpejoh)
+- PayPal: dpejoh@atomicmail.io
+- BTC: bc1qfy4vfstns4aqhvck66x0r53n3hfkkzhwkt7zpw
+- ETC: 0x895762C0Fd2BeF54EE3cD478Fc03212aeA673a68
 
 ## Quick start
 
@@ -50,6 +56,14 @@ npm run build
 ```
 
 Output: `module.zip`
+
+## Legal
+
+For educational purposes only. The developer does not condone illegal activities — bypassing DRM, violating terms of service, or committing fraud. Users are solely responsible for complying with applicable laws.
+
+## Warning
+
+Using this software may void your warranty, cause boot loops, break apps (banking, streaming, etc.), or result in account bans. No warranty is provided. Use at your own risk. Always maintain backups of important data.
 
 ## License
 

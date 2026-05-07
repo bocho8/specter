@@ -131,3 +131,32 @@
 
 ### Other
 - curl binary verification before use — falls back to wget if broken.
+
+## v1.2.0
+
+### Feature Toggle System
+- Added Control page — new nav tab with per-feature enable/disable toggles.
+- Boot Behavior section — toggle recovery folder hiding, boot hardening, bootloader spoofer block, ROM spoof engine block, and LSPosed ODEX cleanup individually.
+- Action Pipeline section — toggle individual action-button steps: kill Play Store, regenerate target, set security patch, set verified boot hash, set fingerprint.
+- Toggle values stored as config files via `cfg_get`/`cfg_set` — survive reboots and app uninstalls.
+- Every feature script sources `config_env.sh` and gates itself against its toggle before running.
+
+### WebUI Restructure
+- Merged Setup and Maintain pages into single Tools page — 5 nav tabs reduced to 4 for better phone fit.
+- Old `#setup` and `#maintain` URL hashes automatically migrate to `#tools` on first load.
+- Last-visited tab persistence migrated accordingly.
+
+### Navigation
+- Double-tap nav tab: 1 tap switches page (no scroll reset), 2 taps on same tab scrolls to top.
+- Nav bar right-padding clipping fixed — removed `max-width` constraint.
+
+### Install Behavior
+- Removed forced `target.sh` execution on module flash — no longer overwrites user's custom target.txt on reinstall.
+
+### Action Pipeline
+- Replaced monolithic `orchestrator.sh` call in `action.sh` with individually gated feature calls — skipped features log nothing and don't abort the pipeline.
+
+### Documentation
+- Added Legal disclaimer — educational purposes only, no liability for misuse.
+- Added Warning section — outlines risks (warranty void, boot loops, app bans, etc.).
+- Added Support section with Ko-fi, PayPal, BTC, and ETC donation options.

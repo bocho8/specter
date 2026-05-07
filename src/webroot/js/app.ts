@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   wireBlacklistToggle();
   wireSmartmergeEditor();
   wireToggles();
+  wireControlToggles();
   initRedirect();
   buildFriendlyNames();
 
@@ -88,10 +89,23 @@ function wireTopBarScroll() {
 }
 
 function wireNavigation() {
+  // Migrate old hashes to new tools-page
+  const oldHash = location.hash.replace('#', '');
+  if (oldHash === 'setup' || oldHash === 'maintain') {
+    history.replaceState(null, '', '#tools');
+  }
+  const savedTab = localStorage.getItem('lastTab');
+  if (savedTab === 'setup' || savedTab === 'maintain') {
+    localStorage.setItem('lastTab', 'tools');
+  }
+
   const navTabs = document.querySelectorAll('.nav-tab');
   const indicator = document.getElementById('nav-indicator')!;
-  const pageIds = ['home-page', 'setup-page', 'maintain-page', 'settings-page'];
+  const pageIds = ['home-page', 'tools-page', 'control-page', 'settings-page'];
   const pages = pageIds.map(id => document.getElementById(id)!).filter(Boolean);
+
+  let lastClickTab: string | null = null;
+  let clickTimer: ReturnType<typeof setTimeout> | null = null;
 
   function reposition(tab: HTMLElement) {
     indicator.style.left = tab.offsetLeft + 'px';
@@ -111,7 +125,6 @@ function wireNavigation() {
     reposition(tab);
     const pageId = tab.dataset.page || '';
     pages.forEach((el) => { el.hidden = el.id !== pageId; });
-    window.scrollTo({ top: 0, behavior: 'instant' });
     const hash = pageId.replace('-page', '');
     if (location.hash !== `#${hash}`) history.pushState(null, '', `#${hash}`);
     localStorage.setItem('lastTab', hash);
@@ -125,7 +138,20 @@ function wireNavigation() {
 
   navTabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      activateTab(tab as HTMLElement);
+      const pageId = (tab as HTMLElement).dataset.page || '';
+      if (lastClickTab === pageId) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        lastClickTab = null;
+        if (clickTimer) clearTimeout(clickTimer);
+        clickTimer = null;
+      } else {
+        lastClickTab = pageId;
+        activateTab(tab as HTMLElement);
+        clickTimer = setTimeout(() => {
+          lastClickTab = null;
+          clickTimer = null;
+        }, 400);
+      }
     });
   });
 
@@ -676,7 +702,7 @@ function wireSmartmergeEditor() {
 }
 
 function wireToggles() {
-  const recoverySw = document.getElementById('recovery-switch') as any;
+  const recoverySw = document.getElementById('toggle-recovery') as any;
   if (recoverySw) {
     recoverySw.addEventListener('change', async () => {
       if (recoverySw.selected) {
@@ -685,6 +711,30 @@ function wireToggles() {
         await exec('rm -f /data/adb/Specter/twrp');
       }
       showToast(recoverySw.selected ? 'Recovery hiding enabled' : 'Recovery hiding disabled', { icon: 'check_circle', type: 'success' as any, autoCloseDelay: 2000 });
+    });
+  }
+}
+
+function wireControlToggles() {
+  const toggles: Array<{ id: string; key: string }> = [
+    { id: 'toggle-recovery', key: 'toggle_recovery' },
+    { id: 'toggle-boot_hardening', key: 'toggle_boot_hardening' },
+    { id: 'toggle-bootloader_spoofer', key: 'toggle_bootloader_spoofer' },
+    { id: 'toggle-rom_spoof', key: 'toggle_rom_spoof' },
+    { id: 'toggle-lsposed', key: 'toggle_lsposed' },
+    { id: 'toggle-action_gms', key: 'toggle_action_gms' },
+    { id: 'toggle-action_target', key: 'toggle_action_target' },
+    { id: 'toggle-action_security_patch', key: 'toggle_action_security_patch' },
+    { id: 'toggle-action_boot_hash', key: 'toggle_action_boot_hash' },
+    { id: 'toggle-action_pif', key: 'toggle_action_pif' },
+  ];
+
+  for (const { id, key } of toggles) {
+    const sw = document.getElementById(id) as any;
+    if (!sw) continue;
+    cfgGet(key, '1').then(val => { sw.selected = val !== '0'; });
+    sw.addEventListener('change', () => {
+      cfgSet(key, sw.selected ? '1' : '0');
     });
   }
 }

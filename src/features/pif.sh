@@ -1,6 +1,9 @@
 #!/system/bin/sh
+set -e
 MODDIR=${0%/*}
 . "$MODDIR/../lib/common.sh"
+. "$MODDIR/../lib/config_env.sh"
+[ "$(cfg_get toggle_pif 1)" = "0" ] && exit 0
 
 log "PIF" "Start"
 

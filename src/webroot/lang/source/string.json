@@ -2,8 +2,8 @@
   "app_title": "Specter",
 
   "nav_home": "Home",
-  "nav_setup": "Setup",
-  "nav_maintain": "Maintain",
+  "nav_tools": "Tools",
+  "nav_control": "Control",
   "nav_settings": "Settings",
 
   "home_version": "Module Version",
@@ -139,5 +139,30 @@
   "custom_kb_not_found_desc": "This keybox could not be matched to any known source",
 
   "advance_scan_clean_props": "Scan & Clean Suspicious Props",
-  "advance_scan_clean_props_desc": "Scan and remove leftover Xposed, ADB, LuckyTool, and modding tool traces"
+  "advance_scan_clean_props_desc": "Scan and remove leftover Xposed, ADB, LuckyTool, and modding tool traces",
+
+  "control_boot_title": "Boot Behavior",
+
+  "control_toggle_recovery": "Auto-Hide Recovery Folders",
+  "control_toggle_recovery_desc": "Hide TWRP, OrangeFox, FOX recovery folders from /sdcard at boot",
+  "control_toggle_boot_hardening": "Boot Hardening",
+  "control_toggle_boot_hardening_desc": "Apply security prop hardening (ro.secure, ro.debuggable, etc.) at boot",
+  "control_toggle_bootloader_spoofer": "Bootloader Spoofer Block",
+  "control_toggle_bootloader_spoofer_desc": "Remove conflicting bootloader spoofer packages at boot",
+  "control_toggle_rom_spoof": "Block ROM Spoof Engines",
+  "control_toggle_rom_spoof_desc": "Disable ROM-level spoof engines (PixelProps, PIHooks, etc.)",
+  "control_toggle_lsposed": "LSPosed ODEX Clean",
+  "control_toggle_lsposed_desc": "Delete base.odex files from /data/app at boot (LSPosed trace clean)",
+
+  "control_action_title": "Action Pipeline",
+  "control_toggle_action_gms": "Kill Play Store",
+  "control_toggle_action_gms_desc": "Force-stop and clear Play Store, GMS, and DroidGuard processes",
+  "control_toggle_action_target": "Regenerate Target",
+  "control_toggle_action_target_desc": "Regenerate Tricky Store target.txt with all installed apps",
+  "control_toggle_action_security_patch": "Set Security Patch",
+  "control_toggle_action_security_patch_desc": "Write spoofed security patch date to Tricky Store",
+  "control_toggle_action_boot_hash": "Set Verified Boot Hash",
+  "control_toggle_action_boot_hash_desc": "Read and write verified boot hash for attestation",
+  "control_toggle_action_pif": "Set Fingerprint (PIF)",
+  "control_toggle_action_pif_desc": "Run Play Integrity Fix auto-update scripts",
 }

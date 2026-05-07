@@ -52,7 +52,7 @@ function applyDeviceInfo(data: InfoJson) {
 
 function applyFlags(flags: { twrp?: boolean; blacklist?: boolean }) {
   if (!flags) return;
-  const recoverySwitch = document.getElementById('recovery-switch') as any;
+  const recoverySwitch = document.getElementById('toggle-recovery') as any;
   if (recoverySwitch) recoverySwitch.selected = !!flags.twrp;
   const blacklistSwitch = document.getElementById('blacklist-switch') as any;
   if (blacklistSwitch) blacklistSwitch.selected = !!flags.blacklist;
