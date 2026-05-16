@@ -35,6 +35,11 @@
 
 ### Conditional Integration — Audit & Refactor
 
+- **`apply_boot_props()` scoped to early boot only** — moved from `boot_core.sh` back to early `service.sh` (Magisk only). KSU/APatch don't run it (same as v1.3.2). The unified boot refactor had mistakenly moved it to post-boot timing where it ran twice on Magisk and for the first time on KSU/APatch.
+- **AVB-safe prop set** — `apply_boot_props()` no longer overrides `ro.boot.*` / `vendor.boot.*` properties (`verifiedbootstate`, `vbmeta.device_state`, `flash.locked`, `veritymode`, `vbmeta.avb_version`, `vbmeta.hash_alg`, `qemu`, `selinux`, `realme.*`, `warranty_bit`, recovery mode props). These are set by the bootloader at power-on; overriding them post-boot causes AVB HAL to report abnormal state. Only non-AVB props kept (`ro.debuggable`, `ro.secure`, `ro.build.type`, `ro.build.tags`).
+- **Delayed spoofing limited to `ro.crypto.state`** — removed `ro.build.tags release-keys` re-apply at 120s (same AVB risk).
+- **Section-specific icon colors** — Tools page sections now have distinct M3 container colors per section (tertiary for Keybox/Configs, secondary for Google Services, error for PIF detection, default primary for Tricky Store).
+- **Restored `gms.sh` and `target.sh` one-shot buttons** — re-added "Force Close Play Store" and "Set target.txt" to Tools page as immediate-action buttons alongside the pipeline toggles.
 - **Fixed `toggle-lsposed` never running at boot** — was missing from both `service.sh` and `boot-completed.sh` despite having a full feature script, toggle, and conflict management. Added invocation to both boot paths.
 - **Fixed recovery toggle initial state overwrite** — `applyFlags()` from device info set the correct switch state, but `wireControlToggles()` immediately overwrote it from config. Reordered init so device info has final say.
 - **Fixed passive conflict toggles being decorative no-ops** — `_conflict_claimed()` for passive modules always returned "claimed" regardless of the user's priority choice. Now honors `priority_specter` vs `priority_module`.

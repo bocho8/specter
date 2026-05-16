@@ -194,6 +194,18 @@ section:not([hidden]) {
   font-family: 'Material Icons';
 }
 
+.list-container--keybox .li-icon { background: var(--md-sys-color-tertiary-container); }
+.list-container--keybox .li-icon md-icon { color: var(--md-sys-color-on-tertiary-container); }
+
+.list-container--google .li-icon { background: var(--md-sys-color-secondary-container); }
+.list-container--google .li-icon md-icon { color: var(--md-sys-color-on-secondary-container); }
+
+.list-container--pif .li-icon { background: var(--md-sys-color-error-container); }
+.list-container--pif .li-icon md-icon { color: var(--md-sys-color-on-error-container); }
+
+.list-container--config .li-icon { background: var(--md-sys-color-tertiary-container); }
+.list-container--config .li-icon md-icon { color: var(--md-sys-color-on-tertiary-container); }
+
 .keybox-install-card {
   --md-filled-card-container-shape: 20px;
   --md-filled-card-container-color: var(--md-sys-color-surface-container-high);

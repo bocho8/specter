@@ -7,8 +7,7 @@
 
 log "BOOT" "Running unified boot core"
 
-# Boot props (idempotent — safe to re-apply if service.sh already did)
-apply_boot_props
+# Boot props handled by service.sh at early boot (Magisk only — same as v1.3.2)
 
 # Protect SELinux policy files
 if [ "$(toybox cat /sys/fs/selinux/enforce 2>/dev/null)" = "0" ]; then
@@ -83,7 +82,6 @@ fi
   sleep 120
   log "BOOT" "Delayed spoofing — reapplying critical props"
   sp_try ro.crypto.state encrypted
-  sp_try ro.build.tags release-keys
   hide_recovery_folders
 ) &
 

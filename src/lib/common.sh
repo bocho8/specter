@@ -278,37 +278,21 @@ MATCHES
         ;;
     esac
   done << PROPS
-ro.boot.selinux|enforcing
 ro.build.selinux|1
 ro.secure|1
 ro.adb.secure|1
 ro.debuggable|0
 ro.force.debuggable|0
-ro.kernel.qemu|0
-ro.boot.qemu|0
 ro.crypto.state|encrypted
 ro.hardware.virtual_device|0
 ro.build.type|user
 ro.build.tags|release-keys
 ro.*.build.type|user
 ro.*.build.tags|release-keys
-ro.boot.verifiedbootstate|green
-vendor.boot.verifiedbootstate|green
-ro.boot.vbmeta.device_state|locked
-vendor.boot.vbmeta.device_state|locked
-ro.boot.flash.locked|1
-ro.boot.veritymode|enforcing
-ro.boot.veritymode.managed|yes
-ro.boot.vbmeta.avb_version|2.0
-ro.boot.vbmeta.hash_alg|sha256
 ro.warranty_bit|0
-ro.boot.warranty_bit|0
 ro.vendor.warranty_bit|0
-ro.vendor.boot.warranty_bit|0
 ro.is_ever_orange|0
 ro.secureboot.lockstate|locked
-ro.boot.realme.lockstate|1
-ro.boot.realmebootstate|green
 sys.oem_unlock_allowed|0
 ro.oem_unlock_supported|0
 sys.usb.config|mtp
@@ -316,13 +300,6 @@ sys.usb.adb.disabled|1
 persist.sys.usb.config|none
 service.adb.root|0
 PROPS
-
-  # Recovery mode props — 3-arg: check if contains "recovery", set to "unknown"
-  _abp_rprops="ro.bootmode ro.boot.bootmode vendor.boot.bootmode ro.boot.mode"
-  for _abp_rp in $_abp_rprops; do
-    sp_try "$_abp_rp" recovery unknown
-  done
-  unset _abp_rp _abp_rprops
 }
 
 _pif_prop() {
