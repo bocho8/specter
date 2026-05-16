@@ -45,7 +45,7 @@
 - **Extracted conflict registry to `config/conflicts.txt`** — data file replaces heredoc in `common.sh`. Adding a conflicting module is one line in a text file, no shell code changes.
 - **Added `_feature_should_run()`** — single runtime gate checking both user toggle and conflict claim, used by the unified boot dispatcher.
 - **Moved `toggle-action_keybox` to control page** — was only in `constants.ts` with no HTML element. Now rendered in the Action Pipeline section.
-- **Removed duplicate run-now buttons from Tools page** — `target.sh`, `gms.sh`, `pif.sh` buttons duplicated the action pipeline toggles. Removed. The control page is the single place for pipeline automation.
+
 - **Fixed broken HTML from dev_options removal** — commit `927b7f3` left orphaned elements and a dangling `</div>` that broke DOM nesting, causing pages to render incorrectly.
 - **Synced config on device state refresh** — `applyFlags()` now calls `cfgSet()` so the persisted config matches the detected device state.
 - **Added conflict resolution test suite** — 14 tests covering all conflict types, toggling, `_feature_should_run()`, JSON output, special detection cases, and idempotency. Runs on any Linux box via `bash tests/test_conflicts.sh`.
