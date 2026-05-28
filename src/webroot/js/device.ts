@@ -5,35 +5,8 @@ import { API_URLS } from './constants.js';
 import { getTranslation } from './i18n.js';
 import type { InfoJson, KeyboxInfoJson } from './types.js';
 
-const CACHE_TTL = 30000;
-
-interface DeviceCache {
-  device: InfoJson | null;
-  keybox: KeyboxInfoJson | null;
-  ts: number;
-}
-
-function restoreCache() {
-  try {
-    const raw = localStorage.getItem('specter_device_cache');
-    if (!raw) return;
-    const cache: DeviceCache = JSON.parse(raw);
-    if (Date.now() - cache.ts > CACHE_TTL) return;
-    if (cache.device) applyAllDeviceInfo(cache.device);
-    if (cache.keybox) applyKeyboxStatus(cache.keybox);
-  } catch (e) {}
-}
-
-function saveCache(device: InfoJson | null, keybox: KeyboxInfoJson | null) {
-  try {
-    localStorage.setItem('specter_device_cache', JSON.stringify({ device, keybox, ts: Date.now() }));
-  } catch (e) {}
-}
-
 export async function initDevice() {
-  restoreCache();
-  const [deviceData, keyboxData] = await Promise.all([refreshDevice(), refreshKeyboxStatus()]);
-  if (deviceData || keyboxData) saveCache(deviceData, keyboxData);
+  await Promise.all([refreshDevice(), refreshKeyboxStatus()]);
 }
 
 export async function refreshDevice(): Promise<InfoJson | null> {
@@ -60,14 +33,12 @@ function applyAllDeviceInfo(data: InfoJson) {
   applyDeviceInfo(data);
   if (data.flags) applyFlags(data.flags);
   applyTeeStatus(data);
+  applySecurityPatch(data);
 }
 
 function applyDeviceInfo(data: InfoJson) {
-  setText('android-value', data.android || '—');
-  setText('kernel-value', data.kernel || '—');
   setText('root-value', data.root || '—');
   setText('version-info-value', data.version || '—');
-  setText('patch-value', data.security_patch || data.build_patch || '—');
 }
 
 function applyFlags(flags: { twrp?: boolean; recovery_detected?: boolean }) {
@@ -78,70 +49,82 @@ function applyFlags(flags: { twrp?: boolean; recovery_detected?: boolean }) {
   }
 }
 
-function applyTeeStatus(data: InfoJson) {
-  const el = document.getElementById('tee-value');
-  const card = document.getElementById('tee-status-card');
-  if (!el || !card) return;
-  const status = data.tee_status || '';
-  el.textContent = status === 'broken' ? 'Broken' : status === 'normal' ? 'Normal' : '—';
-  card.className = 'info-card';
-  if (status === 'broken') {
-    card.classList.add('info-card--warning');
-  } else if (status === 'normal') {
-    card.classList.add('info-card--success');
-  }
-}
-
 function applyKeyboxStatus(data: KeyboxInfoJson) {
   const source = document.getElementById('keybox-source')!;
+  const versionEl = document.getElementById('keybox-version')!;
   const statusEl = document.getElementById('keybox-status')!;
-  const icon = document.getElementById('keybox-icon')!;
-  if (!source || !statusEl || !icon) return;
+  const badgeEl = document.getElementById('kb-version-badge')!;
+  if (!source || !statusEl || !badgeEl) return;
 
   if (!data.installed) {
     source.textContent = getTranslation('device_not_installed') || 'Not Installed';
-    source.className = 'keybox-chip keybox-chip--neutral';
-    statusEl.style.display = 'none';
-    icon.textContent = 'vpn_key_off';
+    versionEl.textContent = '';
+    versionEl.className = 'kb-hero-provider-version kb-hero-provider-version--neutral';
+    badgeEl.textContent = '';
+    badgeEl.className = 'kb-version-badge';
+    statusEl.textContent = '—';
+    statusEl.className = 'kb-hero-status-text kb-hero-status-text--neutral';
     return;
   }
 
-  statusEl.style.display = '';
+  const name = data.source
+    ? data.source.charAt(0).toUpperCase() + data.source.slice(1)
+    : getTranslation('device_generic') || 'Generic';
+  source.textContent = name;
 
-  if (data.source === 'Private') {
-    source.textContent = getTranslation('device_private_keybox') || 'Private Keybox';
-    source.className = 'keybox-chip keybox-chip--neutral';
-    icon.textContent = 'lock';
-  } else if (data.source) {
-    const name = data.source.charAt(0).toUpperCase() + data.source.slice(1);
-    const label = data.text ? `${name} ${data.text}` : name;
-    if (data.up_to_date) {
-      source.textContent = label + ' \u00B7 ' + (getTranslation('device_latest') || 'Latest');
-      source.className = 'keybox-chip keybox-chip--latest';
-      icon.textContent = 'verified_user';
-    } else {
-      source.textContent = label;
-      source.className = 'keybox-chip keybox-chip--outdated';
-      icon.textContent = 'system_update';
-    }
+  versionEl.textContent = data.text || data.source_version || '—';
+  versionEl.className = 'kb-hero-provider-version kb-hero-provider-version--neutral';
+
+  if (data.up_to_date && data.source_version) {
+    badgeEl.textContent = getTranslation('device_latest') || 'Latest';
+    badgeEl.className = 'kb-version-badge kb-version-badge--latest';
+  } else if (data.source_version) {
+    badgeEl.textContent = getTranslation('device_generic') || 'Generic';
+    badgeEl.className = 'kb-version-badge kb-version-badge--outdated';
   } else {
-    source.textContent = getTranslation('device_generic') || 'Generic';
-    source.className = 'keybox-chip keybox-chip--neutral';
-    icon.textContent = 'key';
+    badgeEl.textContent = '';
+    badgeEl.className = 'kb-version-badge';
   }
 
   if (data.revoked) {
     statusEl.textContent = getTranslation('custom_kb_revoked') || 'Revoked';
-    statusEl.className = 'keybox-chip keybox-chip--revoked';
-    source.className = 'keybox-chip keybox-chip--revoked';
-    icon.textContent = 'gpp_bad';
+    statusEl.className = 'kb-hero-status-text kb-hero-status-text--revoked';
   } else if (data.softbanned) {
     statusEl.textContent = getTranslation('custom_kb_softbanned') || 'Softbanned';
-    statusEl.className = 'keybox-chip keybox-chip--softbanned';
-    icon.textContent = 'warning';
+    statusEl.className = 'kb-hero-status-text kb-hero-status-text--softbanned';
   } else {
     statusEl.textContent = getTranslation('custom_kb_active') || 'Active';
-    statusEl.className = 'keybox-chip keybox-chip--active';
+    statusEl.className = 'kb-hero-status-text kb-hero-status-text--active';
+  }
+}
+
+function applySecurityPatch(data: InfoJson) {
+  const dateEl = document.getElementById('sp-date');
+  const pifEl = document.getElementById('sp-pif');
+  if (!dateEl) return;
+  dateEl.textContent = data.security_patch || '—';
+  if (pifEl) pifEl.textContent = data.pif_model || '—';
+}
+
+function applyTeeStatus(data: InfoJson) {
+  const el = document.getElementById('tee-value');
+  const card = document.getElementById('tee-status-card');
+  const spTee = document.getElementById('sp-tee');
+  if (!el || !card) return;
+  const status = data.tee_status || '';
+  const label = status === 'broken' ? 'Broken' : status === 'normal' ? 'Normal' : '—';
+  el.textContent = label;
+  card.className = 'info-card-mini';
+  if (status === 'broken') {
+    card.classList.add('info-card-mini--warning');
+  } else if (status === 'normal') {
+    card.classList.add('info-card-mini--success');
+  }
+  if (spTee) {
+    spTee.textContent = label;
+    spTee.className = 'sp-hero-tee';
+    if (status === 'broken') spTee.classList.add('sp-hero-tee--broken');
+    else if (status === 'normal') spTee.classList.add('sp-hero-tee--normal');
   }
 }
 

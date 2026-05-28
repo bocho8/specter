@@ -4,7 +4,6 @@ import { getTranslation } from './i18n.js';
 import { shellEscape, fetchJson } from './utils.js';
 import { showToast } from './toast.js';
 import { openFileBrowser } from './file-browser.js';
-import { openRecentActivity } from './history.js';
 import { refreshKeyboxStatus } from './device.js';
 import { API_URLS } from './constants.js';
 import { runDevAction, runSimpleAction } from './actions.js';
@@ -12,15 +11,6 @@ import { isDevMode } from './state.js';
 import type { CatalogJson } from './types.js';
 
 const t = (key: string, fallback: string): string => getTranslation(key) || fallback;
-
-export function wireKeyboxCard() {
-  const card = document.getElementById('keybox-card');
-  if (!card) return;
-  card.addEventListener('click', () => {
-    const sw = document.getElementById('dev-mode-switch') as MdSwitch | null;
-    openRecentActivity(sw ? sw.selected : false);
-  });
-}
 
 function renderProviderOptions(select: HTMLSelectElement, sources: string[]) {
   while (select.options.length > 1) select.remove(1);
