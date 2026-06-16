@@ -34,6 +34,6 @@ fi
 . "$_root/lib/conflicts.sh"
 
 # Module-local paths
-: "${CONFIG_DIR:="$_root/config"}"
+: "${CONFIG_DIR:="$SPECTER_DIR/config"}"
 
 unset _root

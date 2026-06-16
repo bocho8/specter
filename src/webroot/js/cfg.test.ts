@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { cfgGet, cfgSet, cfgInvalidate, setModuleDir, migrateLocalStorage } from './cfg.js'
+import { cfgGet, cfgSet, cfgInvalidate, setDataDir, migrateLocalStorage } from './cfg.js'
 
 vi.mock('./bridge.js', () => ({
   exec: vi.fn(() => Promise.resolve({ stdout: '', stderr: '', code: 0 })),
@@ -7,7 +7,7 @@ vi.mock('./bridge.js', () => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  setModuleDir('/data/adb/specter')
+  setDataDir('/data/adb/specter')
   cfgInvalidate()
   localStorage.clear()
 })

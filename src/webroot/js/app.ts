@@ -1,6 +1,6 @@
-import { initBridge, getModuleDir, exec } from './bridge.js';
+import { initBridge, getDataDir, getModuleDir, exec } from './bridge.js';
 import { shellEscape } from './utils.js';
-import { setModuleDir, migrateLocalStorage, cfgInit, cfgGet } from './cfg.js';
+import { setDataDir, migrateLocalStorage, cfgInit, cfgGet } from './cfg.js';
 import { initDevice, refreshDevice, refreshKeyboxStatus, refreshConflictStatus } from './device.js';
 import { initNetwork } from './network.js';
 import { initTheme } from './theme.js';
@@ -12,7 +12,7 @@ import { initTerminal } from './terminal.js';
 import { setDevMode } from './state.js';
 import { renderActivityPreview } from './history.js';
 import { wireTopBarScroll, wireNavigation, onHomeShow } from './navigation.js';
-import { wireControlToggles, wireDevMode } from './toggles.js';
+import { renderControlToggles, wireDevMode } from './toggles.js';
 import { wireActions, buildFriendlyNames } from './actions.js';
 
 const t = (key: string, fallback: string): string => getTranslation(key) || fallback;
@@ -34,8 +34,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   const coreMWC = import('./material-core.js');
   try {
     await initBridge();
-    const modPath = getModuleDir();
-    if (modPath) setModuleDir(modPath);
+    const dataPath = getDataDir();
+    if (dataPath) setDataDir(dataPath);
     await cfgInit();
     await migrateLocalStorage();
   } catch (e) {
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   /* Phase 2: Wire event handlers */
   wireActions();
-  wireControlToggles();
+  renderControlToggles();
   wireDevMode();
   buildFriendlyNames();
   initTerminal();

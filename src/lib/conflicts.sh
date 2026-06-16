@@ -1,7 +1,10 @@
 # shellcheck shell=sh
 CONFLICT_BACKUP_FILE="$SPECTER_DIR/conflict_backups.txt"
 
-_conflict_registry() { cat "$MODDIR/config/conflicts.txt" 2>/dev/null || true; }
+_conflict_registry() {
+  cat "$SPECTER_DIR/config/conflicts.txt" 2>/dev/null ||
+  cat "$MODDIR/config/conflicts.txt" 2>/dev/null || true
+}
 
 _conflict_detect() {
   _cd_modid="$1"
@@ -51,26 +54,6 @@ _conflict_apply_scripts() {
   unset _cas_scripts _cas_choice _cas_old_ifs _cas_script
 }
 
-migrate_conflict_config() {
-  _mc_old_dir="$SPECTER_DIR/config"
-  [ -d "$_mc_old_dir" ] || return 0
-  while IFS='|' read -r _mc_id _mc_name _mc_scripts _mc_features _mc_type; do
-    [ -z "$_mc_id" ] && continue
-    _mc_old_file="$_mc_old_dir/conflict_$_mc_id.val"
-    [ -f "$_mc_old_file" ] || continue
-    _mc_current=$(cfg_get "conflict_$_mc_id" "__specter_unset__")
-    if [ "$_mc_current" = "__specter_unset__" ]; then
-      _mc_old_val=$(cat "$_mc_old_file" 2>/dev/null | tr -d '\r\n')
-      case "$_mc_old_val" in
-        priority_specter|priority_module) cfg_set "conflict_$_mc_id" "$_mc_old_val" ;;
-      esac
-    fi
-  done <<EOF
-$(_conflict_registry)
-EOF
-  unset _mc_old_dir _mc_id _mc_name _mc_scripts _mc_features _mc_type _mc_old_file _mc_current _mc_old_val
-}
-
 _feature_should_run() {
   _fsr_feature="$1" _fsr_default="${2:-1}"
   [ "$(cfg_get "toggle_$_fsr_feature" "$_fsr_default")" != "0" ] || return 1
@@ -81,8 +64,6 @@ _feature_should_run() {
 resolve_conflicts() {
   ensure_dir "$SPECTER_DIR"
   touch "$CONFLICT_BACKUP_FILE" 2>/dev/null || true
-
-  migrate_conflict_config
 
   # Moved to boot_core.sh (needs PM service)
   while IFS='|' read -r _rc_id _rc_name _rc_scripts _rc_features _rc_type; do
@@ -126,7 +107,6 @@ EOF
 }
 
 conflict_status_json() {
-  migrate_conflict_config
   _cs_first=1
   printf '['
   while IFS='|' read -r _cs_id _cs_name _cs_scripts _cs_features _cs_type; do
@@ -151,7 +131,6 @@ conflict_set_choice() {
   case "$_csc_choice" in
     priority_specter|priority_module) ;; *) return 1 ;;
   esac
-  migrate_conflict_config
   ensure_dir "$SPECTER_DIR"
   touch "$CONFLICT_BACKUP_FILE" 2>/dev/null || true
   _csc_found=1

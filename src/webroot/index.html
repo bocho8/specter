@@ -411,138 +411,14 @@
         <section id="control-page" hidden>
 
           <h2 class="list-title" data-i18n="control_boot_title">Boot Behavior</h2>
-          <div class="list-container">
-
-            <div class="list-item list-item--toggle" id="toggle-boot_hardening-row">
-              <div class="li-icon"><md-icon aria-hidden="true">security</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_boot_hardening">Boot Hardening</div>
-                <span class="supporting-text" data-i18n="control_toggle_boot_hardening_desc">Harden SELinux enforce, /proc permissions, install-recovery.sh, and spoof bootmode</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-boot_hardening" aria-label="Boot Hardening" data-i18n-aria="control_toggle_boot_hardening"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-vbmeta-row">
-              <div class="li-icon"><md-icon aria-hidden="true">verified</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_vbmeta">VBMeta Integration</div>
-                <span class="supporting-text" data-i18n="control_toggle_vbmeta_desc">Apply AVB vbmeta properties (digest, version, hash algorithm) at boot</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-vbmeta" aria-label="VBMeta Integration" data-i18n-aria="control_toggle_vbmeta"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-prop_handler-row">
-              <div class="li-icon"><md-icon aria-hidden="true">lock</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_prop_handler">Boot State Props</div>
-                <span class="supporting-text" data-i18n="control_toggle_prop_handler_desc">Boot state props, build spoofing, and suspicious props cleanup</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-prop_handler" aria-label="Boot State Props" data-i18n-aria="control_toggle_prop_handler"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-lsposed-row">
-              <div class="li-icon"><md-icon aria-hidden="true">code</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_lsposed">LSPosed ODEX Clean</div>
-                <span class="supporting-text" data-i18n="control_toggle_lsposed_desc">Delete base.odex files from /data/app at boot (LSPosed trace clean)</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-lsposed" aria-label="LSPosed ODEX Clean" data-i18n-aria="control_toggle_lsposed"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-adb_disabler-row">
-              <div class="li-icon"><md-icon aria-hidden="true">usb_off</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_adb_disabler">ADB Disabler</div>
-                <span class="supporting-text" data-i18n="control_toggle_adb_disabler_desc">Disable USB debugging, developer options, and OEM unlock at boot</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-adb_disabler" aria-label="ADB Disabler" data-i18n-aria="control_toggle_adb_disabler"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-rom_fingerprint-row">
-              <div class="li-icon"><md-icon aria-hidden="true">fingerprint</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_rom_fingerprint">ROM Fingerprint</div>
-                <span class="supporting-text" data-i18n="control_toggle_rom_fingerprint_desc">Clean custom ROM identity from build properties at boot</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-rom_fingerprint" aria-label="ROM Fingerprint" data-i18n-aria="control_toggle_rom_fingerprint"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-          </div>
+          <div class="list-container" id="control-boot-container"></div>
 
           <h2 class="list-title" id="conflicts-title" style="display:none" data-i18n="control_conflicts_title">Conflict Resolution</h2>
           <p class="danger-zone-desc" id="conflicts-desc" style="display:none" data-i18n="control_conflicts_desc">Decide which conflicting modules take priority. OFF = Specter handles it. ON = the module handles it.</p>
           <div class="list-container" id="conflicts-container"></div>
 
           <h2 class="list-title" data-i18n="control_action_title">Action Pipeline</h2>
-          <div class="list-container">
-            <div class="list-item list-item--toggle" id="toggle-action_gms-row">
-              <div class="li-icon"><md-icon aria-hidden="true">block</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_action_gms">Kill Play Store</div>
-                <span class="supporting-text" data-i18n="control_toggle_action_gms_desc">Force-stop and clear Play Store, GMS, and DroidGuard processes</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-action_gms" aria-label="Kill Play Store" data-i18n-aria="control_toggle_action_gms"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-action_target-row">
-              <div class="li-icon"><md-icon aria-hidden="true">list_alt</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_action_target">Update Target</div>
-                <span class="supporting-text" data-i18n="control_toggle_action_target_desc">Merge new installed apps into Tricky Store target.txt</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-action_target" aria-label="Update Target" data-i18n-aria="control_toggle_action_target"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-action_security_patch-row">
-              <div class="li-icon"><md-icon aria-hidden="true">security_update_good</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_action_security_patch">Set Security Patch</div>
-                <span class="supporting-text" data-i18n="control_toggle_action_security_patch_desc">Write spoofed security patch date to Tricky Store</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-action_security_patch" aria-label="Set Security Patch" data-i18n-aria="control_toggle_action_security_patch"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-
-            <div class="list-item list-item--toggle" id="toggle-action_pif-row">
-              <div class="li-icon"><md-icon aria-hidden="true">fingerprint</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_action_pif">Set Fingerprint (PIF)</div>
-                <span class="supporting-text" data-i18n="control_toggle_action_pif_desc">Run Play Integrity Fix auto-update scripts</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-action_pif" aria-label="Set Fingerprint (PIF)" data-i18n-aria="control_toggle_action_pif"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-
-            <div class="list-item list-item--toggle" id="toggle-action_keybox-row">
-              <div class="li-icon"><md-icon aria-hidden="true">vpn_key</md-icon></div>
-              <div class="list-item-content">
-                <div class="toggle-text" data-i18n="control_toggle_action_keybox">Install Keybox</div>
-                <span class="supporting-text" data-i18n="control_toggle_action_keybox_desc">Download and install a valid keybox from the catalog</span>
-              </div>
-              <div class="spacer"></div>
-              <md-switch icons id="toggle-action_keybox" aria-label="Install Keybox" data-i18n-aria="control_toggle_action_keybox"></md-switch>
-              <md-ripple></md-ripple>
-            </div>
-          </div>
+          <div class="list-container" id="control-action-container"></div>
 
         </section>
 

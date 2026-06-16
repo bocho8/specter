@@ -17,21 +17,23 @@ export interface ToggleDef {
   id: string;
   key: string;
   default?: string;
+  icon: string;
+  section: 'boot' | 'action';
 }
 
 export const CONTROL_TOGGLES: ToggleDef[] = [
-  { id: 'toggle-boot_hardening', key: 'toggle_boot_hardening' },
-  { id: 'toggle-prop_handler', key: 'toggle_prop_handler' },
-  { id: 'toggle-lsposed', key: 'toggle_lsposed' },
-  { id: 'toggle-vbmeta', key: 'toggle_vbmeta' },
-  { id: 'toggle-rom_fingerprint', key: 'toggle_rom_fingerprint', default: '0' },
-  { id: 'toggle-adb_disabler', key: 'toggle_adb_disabler', default: '0' },
-  { id: 'toggle-action_gms', key: 'toggle_action_gms' },
-  { id: 'toggle-action_target', key: 'toggle_action_target' },
-  { id: 'toggle-action_security_patch', key: 'toggle_action_security_patch' },
-  { id: 'toggle-action_keybox', key: 'toggle_action_keybox' },
-  { id: 'toggle-action_pif', key: 'toggle_action_pif' },
-  { id: 'toggle-denylist_merge', key: 'toggle_denylist_merge' },
+  { id: 'toggle-boot_hardening', key: 'toggle_boot_hardening', icon: 'security', section: 'boot' },
+  { id: 'toggle-vbmeta', key: 'toggle_vbmeta', icon: 'verified', section: 'boot' },
+  { id: 'toggle-prop_handler', key: 'toggle_prop_handler', icon: 'lock', section: 'boot' },
+  { id: 'toggle-lsposed', key: 'toggle_lsposed', icon: 'code', section: 'boot' },
+  { id: 'toggle-adb_disabler', key: 'toggle_adb_disabler', default: '0', icon: 'usb_off', section: 'boot' },
+  { id: 'toggle-rom_fingerprint', key: 'toggle_rom_fingerprint', default: '0', icon: 'fingerprint', section: 'boot' },
+  { id: 'toggle-action_gms', key: 'toggle_action_gms', icon: 'block', section: 'action' },
+  { id: 'toggle-action_target', key: 'toggle_action_target', icon: 'list_alt', section: 'action' },
+  { id: 'toggle-action_security_patch', key: 'toggle_action_security_patch', icon: 'security_update_good', section: 'action' },
+  { id: 'toggle-action_pif', key: 'toggle_action_pif', icon: 'fingerprint', section: 'action' },
+  { id: 'toggle-action_keybox', key: 'toggle_action_keybox', icon: 'vpn_key', section: 'action' },
+  { id: 'toggle-denylist_merge', key: 'toggle_denylist_merge', icon: 'playlist_remove', section: 'action' },
 ];
 
 export const TRICKY_DIR = '/data/adb/tricky_store';

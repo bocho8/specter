@@ -1,16 +1,16 @@
 import { exec as bridgeExec } from './bridge.js';
 import { shellEscape } from './utils.js';
 
-let MODULE: string | null = null;
+let DATA_DIR: string | null = null;
 const cache: Record<string, string | undefined | null> = {};
 
-/** Set the module base directory for config file access. */
-export function setModuleDir(path: string) { MODULE = path; }
+/** Set the Specter data directory for config file access. */
+export function setDataDir(path: string) { DATA_DIR = path; }
 
 /** Pre-populate the config cache by reading all `.val` files from the config directory. */
 export async function cfgInit() {
-  if (!MODULE) return;
-  const cfgDir = shellEscape(MODULE + '/config');
+  if (!DATA_DIR) return;
+  const cfgDir = shellEscape(DATA_DIR + '/config');
   const cmd = `for f in ${cfgDir}/*.val; do [ -f "\$f" ] || continue; k="\${f##*/}"; k="\${k%.val}"; v="\$(cat "\$f")"; [ -n "\$v" ] || continue; printf 'CFG:%s\n' "\$k"; printf '%s\n' "\$v"; done`;
   const result = await bridgeExec(cmd);
   const stdout = (result.stdout || '').trim();
@@ -28,17 +28,17 @@ export async function cfgInit() {
 }
 
 async function readConfig(key: string): Promise<string | null> {
-  if (!MODULE) return null;
+  if (!DATA_DIR) return null;
   const result = await bridgeExec(
-    `cat ${shellEscape(MODULE + '/config/' + key + '.val')} 2>/dev/null || true`
+    `cat ${shellEscape(DATA_DIR + '/config/' + key + '.val')} 2>/dev/null || true`
   );
   return (result.stdout || '').trim() || null;
 }
 
 function writeConfig(key: string, val: string | undefined | null) {
-  if (!MODULE) return Promise.resolve();
+  if (!DATA_DIR) return Promise.resolve();
   const cmd =
-    `mkdir -p ${shellEscape(MODULE + '/config')} && printf '%s' ${shellEscape(val || '')} > ${shellEscape(MODULE + '/config/' + key + '.val')}`;
+    `mkdir -p ${shellEscape(DATA_DIR + '/config')} && printf '%s' ${shellEscape(val || '')} > ${shellEscape(DATA_DIR + '/config/' + key + '.val')}`;
   return bridgeExec(cmd).catch((err: any) => console.warn('Config write failed for', key, err));
 }
 

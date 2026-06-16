@@ -80,6 +80,10 @@ mkdir -p "$SPECTER_DIR"
 echo "1" > "$SPECTER_DIR/tee_reported"
 echo "1" > "$SPECTER_DIR/rom_spoof_reported"
 
+# Copy shipped config files to data dir
+mkdir -p "$SPECTER_DIR/config"
+cp "$MODPATH/config/conflicts.txt" "$SPECTER_DIR/config/conflicts.txt" 2>/dev/null || true
+
 # Conflicts are resolved automatically at boot, no interactive prompts needed
 
 # Generate fresh keybox info for description
