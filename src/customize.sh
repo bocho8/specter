@@ -66,7 +66,7 @@ if [ "$_ts_found" = true ]; then
 fi
 unset _ts_found
 
-# Mark first-boot setup as pending (runs once after reboot in boot_core.sh)
+# Mark first-boot setup as pending (runs once after reboot in service.sh)
 touch "$MODPATH/.first_boot_pending"
 
 mkdir -p "$MODPATH/webroot/json"
@@ -75,10 +75,13 @@ echo "{\"MODDIR\": \"$MODPATH\", \"SPECTER_DIR\": \"$SPECTER_DIR\"}" > "$MODPATH
 # Backup module.prop for description override system
 cp "$MODPATH/module.prop" "$MODPATH/module.prop.bak"
 
-# Mark TEE for first-boot check (removed by boot_core.sh after running)
+# Mark TEE for first-boot check (removed by service.sh after running)
 mkdir -p "$SPECTER_DIR"
 echo "1" > "$SPECTER_DIR/tee_reported"
 echo "1" > "$SPECTER_DIR/rom_spoof_reported"
+
+# Ensure backup dir exists for first-boot snapshot
+mkdir -p "$SPECTER_DIR/backup"
 
 # Copy shipped config files to data dir
 mkdir -p "$SPECTER_DIR/config"

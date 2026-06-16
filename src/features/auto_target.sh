@@ -25,7 +25,7 @@ _known=""
 _new_pkgs=""
 while IFS= read -r _pkg; do
   [ -z "$_pkg" ] && continue
-  if ! echo "$_known" | grep -Fxq "$_pkg" 2>/dev/null; then
+    if ! echo "$_known" | grep -Fxq "$_pkg" 2>/dev/null && ! grep -Fxq "$_pkg" "$TARGET_TXT" 2>/dev/null; then
     if [ -f "$BLACKLIST_ENABLED" ] && [ -s "$BLACKLIST" ]; then
       if grep -Fxq "$_pkg" "$BLACKLIST" 2>/dev/null; then
         continue

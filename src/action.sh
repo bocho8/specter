@@ -16,7 +16,11 @@ log_rotate "$ACTION_LOG"
 {
   log "ACTION" "Running full integrity pipeline"
 
-  sh "$MODDIR/orchestrator.sh" "action_integrity" || true
+  [ "$(cfg_get toggle_action_gms 1)" != "0" ] && sh "$MODDIR/features/kill_play_store.sh" >/dev/null 2>&1 || true
+  [ "$(cfg_get toggle_action_target 1)" != "0" ] && sh "$MODDIR/features/target.sh" --merge >/dev/null 2>&1 || true
+  [ "$(cfg_get toggle_action_security_patch 1)" != "0" ] && sh "$MODDIR/features/security_patch.sh" >/dev/null 2>&1 || true
+  [ "$(cfg_get toggle_action_keybox 1)" != "0" ] && sh "$MODDIR/features/keybox.sh" >/dev/null 2>&1 || true
+  [ "$(cfg_get toggle_action_pif 1)" != "0" ] && [ -f "$MODDIR/features/pif.sh" ] && sh "$MODDIR/features/pif.sh" >/dev/null 2>&1 || true
 
   run_device_info "$MODDIR"
   sh "$MODDIR/features/keybox_info.sh" >/dev/null 2>&1 || true

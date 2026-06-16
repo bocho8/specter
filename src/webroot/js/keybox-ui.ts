@@ -24,6 +24,19 @@ function renderProviderOptions(select: HTMLSelectElement, sources: string[]) {
 
 const providerSelects = new WeakSet<HTMLSelectElement>();
 
+async function fetchCatalog(): Promise<CatalogJson | null> {
+  const url = API_URLS.KEY_CATALOG!;
+  const data = await fetchJson<CatalogJson>(url, 300000).catch(() => null);
+  if (data?.entries) return data;
+  if (typeof exec !== 'function') return null;
+  try {
+    const res = await exec(`curl -sfL --connect-timeout 10 ${shellEscape(url)}`);
+    return JSON.parse(res.stdout) as CatalogJson;
+  } catch {
+    return null;
+  }
+}
+
 export async function populateProviders() {
   const select = document.getElementById('kb-provider') as HTMLSelectElement | null;
   if (!select) return;
@@ -33,16 +46,12 @@ export async function populateProviders() {
     select.addEventListener('change', () => { cfgSet('kb_provider', select.value); });
   }
 
-  try {
-    const data = await fetchJson<CatalogJson>(API_URLS.KEY_CATALOG!, 300000);
-    if (data?.entries) {
-      const sources = [...new Set(data.entries.map(e => e.source))].sort();
-      const currentValue = select.value;
-      renderProviderOptions(select, sources);
-      select.value = currentValue;
-    }
-  } catch (e) {
-    console.warn('Provider fetch failed:', e);
+  const data = await fetchCatalog();
+  if (data?.entries) {
+    const sources = [...new Set(data.entries.map(e => e.source))].sort();
+    const currentValue = select.value;
+    renderProviderOptions(select, sources);
+    select.value = currentValue;
   }
 }
 

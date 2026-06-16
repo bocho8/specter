@@ -10,11 +10,6 @@ check_network || { log "KEYBOX" "Error: No internet connection"; exit 1; }
 
 [ -d "$TRICKY_DIR" ] || die "Tricky Store data directory not found"
 
-if [ -f "$TARGET_FILE" ] && [ ! -f "$BACKUP_FILE" ]; then
-  cp "$TARGET_FILE" "$BACKUP_FILE"
-  log "KEYBOX" "Created backup of existing keybox"
-fi
-
 DECODE_FILE="/data/local/tmp/keybox_decode.$$"
 TEMP_FILE="/data/local/tmp/keybox.tmp.$$"
 trap 'rm -f "$DECODE_FILE" "$TEMP_FILE" 2>/dev/null' EXIT
@@ -47,7 +42,6 @@ if [ -n "$_custom_type" ] && [ -n "$_custom_value" ]; then
       download "$_custom_value" > "$TEMP_FILE" || {
         log "KEYBOX" "Error: Custom URL download failed"
         _clear_custom
-        [ -f "$BACKUP_FILE" ] && cp "$BACKUP_FILE" "$TARGET_FILE"
         exit 1
       }
       if decode_keybox_blob "$TEMP_FILE" "$DECODE_FILE" 2>/dev/null && [ -s "$DECODE_FILE" ]; then
@@ -58,7 +52,6 @@ if [ -n "$_custom_type" ] && [ -n "$_custom_value" ]; then
       fi
       log "KEYBOX" "Error: Custom keybox decode failed, not a valid base64 blob"
       _clear_custom
-      [ -f "$BACKUP_FILE" ] && cp "$BACKUP_FILE" "$TARGET_FILE"
       exit 1
       ;;
   esac
@@ -113,19 +106,16 @@ _DL_URL="${KEYBOX_URL}/${_DL_SOURCE}/${_DL_VER}"
 log "KEYBOX" "Downloading keybox..."
 download "$_DL_URL" > "$TEMP_FILE" || {
   log "KEYBOX" "Error: Download failed"
-  [ -f "$BACKUP_FILE" ] && cp "$BACKUP_FILE" "$TARGET_FILE"
   exit 1
 }
 
 if ! decode_keybox_blob "$TEMP_FILE" "$DECODE_FILE" 2>/dev/null; then
   log "KEYBOX" "Error: Base64 decode failed"
-  [ -f "$BACKUP_FILE" ] && cp "$BACKUP_FILE" "$TARGET_FILE"
   exit 1
 fi
 
 [ -s "$DECODE_FILE" ] || {
   log "KEYBOX" "Error: Decoded keybox is empty"
-  [ -f "$BACKUP_FILE" ] && cp "$BACKUP_FILE" "$TARGET_FILE"
   exit 1
 }
 

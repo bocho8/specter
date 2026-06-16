@@ -63,7 +63,6 @@ describe('required files', () => {
     'service.sh',
     'post-fs-data.sh',
     'uninstall.sh',
-    'orchestrator.sh',
     'refresh_desc.sh',
     'lib/common.sh',
     'features/keybox.sh',
@@ -113,24 +112,6 @@ describe('JSON files', () => {
     for (const f of known) {
       expect(existsSync(`${MODULE_DIR}/${f}`)).toBe(true)
       expect(() => JSON.parse(readFileSync(`${MODULE_DIR}/${f}`, 'utf8'))).not.toThrow()
-    }
-  })
-})
-
-describe('pipeline cross-references', () => {
-  it('feature scripts reference pipeline toggles', () => {
-    const pipeline = readFileSync(`${MODULE_DIR}/pipelines/action_integrity`, 'utf8')
-    const toggles = pipeline.match(/toggle:(\w+)/g) || []
-    for (const t of toggles) {
-      const toggle = t.replace('toggle:', '')
-      const featureFiles = files.filter(f => f.startsWith('features/') && f.endsWith('.sh'))
-      const matching = featureFiles.filter(f => {
-        const content = readFileSync(`${MODULE_DIR}/${f}`, 'utf8')
-        return content.includes(toggle)
-      })
-      if (toggle === 'action_keybox') {
-        expect(matching.length).toBeGreaterThan(0)
-      }
     }
   })
 })

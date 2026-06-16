@@ -2,37 +2,6 @@
 # Shared routines for target.sh and target_merge.sh
 # Source after common.sh, paths.sh, package_list.sh, config_env.sh
 
-# Returns 1 if TEESimulator was handled (caller should exit)
-_tee_section() {
-  _is_teesimulator || return 0
-  log "TARGET" "TEESimulator, generating locked.xml section"
-  _cust="/sdcard/Specter/customize.txt"
-  if [ -f "$_cust" ] && [ "$(head -1 "$_cust" 2>/dev/null)" != "#disable" ]; then
-    _locked=$(grep -v '^#' "$_cust" | sed 's/[!?]$//' 2>/dev/null || echo "")
-    if [ -n "$_locked" ]; then
-      [ -f "$TARGET_TXT" ] && cp "$TARGET_TXT" "${TARGET_TXT}.bak"
-      _tmp=$(mktemp 2>/dev/null || echo "/data/local/tmp/.specter_tee_$$")
-      _locked_f="/data/local/tmp/.specter_locked.$$"
-      printf '%s\n' "$_locked" > "$_locked_f"
-      if [ -f "$TARGET_TXT" ] && [ -s "$TARGET_TXT" ]; then
-        sed '/^\[/d' "$TARGET_TXT" | grep -Fvxf "$_locked_f" > "$_tmp"
-      fi
-      rm -f "$_locked_f"
-      printf '%s\n' '[locked.xml]' "$_locked" >> "$_tmp"
-      if [ -s "$_tmp" ]; then
-        mv -f "$_tmp" "$TARGET_TXT"
-      else
-        rm -f "$_tmp"
-      fi
-      unset _tmp
-    fi
-    unset _locked
-  fi
-  unset _cust
-  log "TARGET" "Finish (TEESimulator)"
-  return 1
-}
-
 # Ensure blacklist exists
 _ensure_blacklist() {
   BLACKLIST="$SPECTER_DIR/blacklist.txt"

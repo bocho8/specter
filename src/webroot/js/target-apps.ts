@@ -273,7 +273,7 @@ export async function openTargetAppsManager() {
     closeTapMenu();
     if (mode === 'target') {
       appendToOutput('[TARGET] Loading blacklist...');
-      exec('cat ${specterDir()}/blacklist.txt 2>/dev/null || echo ""').then(({ stdout }) => {
+      exec(`cat ${specterDir()}/blacklist.txt 2>/dev/null || echo ""`).then(({ stdout }) => {
         blPkgs = new Set(stdout.split('\n').map(s => s.trim()).filter(Boolean));
         appendToOutput(`[TARGET] Loaded ${blPkgs.size} blacklisted entries`);
         for (const app of apps) {
@@ -284,7 +284,7 @@ export async function openTargetAppsManager() {
     } else {
       setMode('target');
       appendToOutput('[TARGET] Reloading target states...');
-      exec('cat ${TRICKY_DIR}/target.txt 2>/dev/null || echo ""').then(({ stdout }) => {
+      exec(`cat ${TRICKY_DIR}/target.txt 2>/dev/null || echo ""`).then(({ stdout }) => {
         const lines = stdout.split('\n').map(s => s.trim()).filter(Boolean);
         targetMap.clear();
         for (const line of lines) {
@@ -337,7 +337,7 @@ export async function openTargetAppsManager() {
 
       let blSet = new Set<string>();
       if (mode === 'blacklist') {
-        const { stdout } = await exec('cat ${specterDir()}/blacklist.txt 2>/dev/null || echo ""');
+        const { stdout } = await exec(`cat ${specterDir()}/blacklist.txt 2>/dev/null || echo ""`);
         blSet = new Set(stdout.split('\n').map(s => s.trim()).filter(Boolean));
       }
 
@@ -363,7 +363,7 @@ export async function openTargetAppsManager() {
   async function loadData() {
     try {
       const [{ stdout: targetRaw }, { stdout: userRaw }] = await Promise.all([
-        exec('cat ${TRICKY_DIR}/target.txt 2>/dev/null || echo ""'),
+        exec(`cat ${TRICKY_DIR}/target.txt 2>/dev/null || echo ""`),
         exec('pm list packages -3 2>/dev/null | cut -d: -f2'),
       ]);
 

@@ -9,8 +9,6 @@ log "TARGET" "Start"
 
 [ -d "$TRICKY_DIR" ] || die "Tricky Store data directory not found"
 
-_tee_section || true
-
 MODULE_ROOT="${MODDIR%/features}"
 TEMP_PKGS="$MODULE_ROOT/pkgs.txt"
 _TMP_TARGET="${TARGET_TXT}.new.$$"
